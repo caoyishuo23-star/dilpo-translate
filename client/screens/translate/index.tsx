@@ -96,12 +96,6 @@ export default function TranslateScreen() {
     setError(null);
 
     try {
-      /**
-       * 服务端文件：server/src/routes/translate.ts
-       * 接口：POST /api/v1/translate
-       * Body 参数：text: string, sourceLang: string
-       * 返回：englishText, urduText, chineseText (根据源语言)
-       */
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -193,30 +187,36 @@ export default function TranslateScreen() {
     setError(null);
   };
 
-  // 判断是否是RTL语言
-  const isRTLLanguage = (lang: Language) => lang === 'ur';
-
-  // 根据源语言决定显示哪些翻译结果（乌尔都语在上，英文在下）
-  const getOutputConfigs = () => {
+  // 获取主翻译结果（目标：乌尔都语或中文）
+  const getPrimaryTranslation = () => {
     if (sourceLang === 'zh') {
-      return [
-        { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
-        { key: 'en', label: 'English', text: englishText, isRTL: false },
-      ];
+      // 中文输入 → 主翻译：乌尔都语
+      return { text: urduText, label: 'اردو', isRTL: true };
     } else if (sourceLang === 'en') {
-      return [
-        { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
-        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
-      ];
+      // 英文输入 → 主翻译：乌尔都语
+      return { text: urduText, label: 'اردو', isRTL: true };
     } else {
-      return [
-        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
-        { key: 'en', label: 'English', text: englishText, isRTL: false },
-      ];
+      // 乌尔都语输入 → 主翻译：中文
+      return { text: chineseText, label: '中文', isRTL: false };
     }
   };
 
-  const outputConfigs = getOutputConfigs();
+  // 获取参考翻译结果（用于对照检验）
+  const getReferenceTranslation = () => {
+    if (sourceLang === 'zh') {
+      // 中文输入 → 参考：英文
+      return { text: englishText, label: 'English 参考翻译', isRTL: false };
+    } else if (sourceLang === 'en') {
+      // 英文输入 → 参考：中文
+      return { text: chineseText, label: '中文 参考翻译', isRTL: false };
+    } else {
+      // 乌尔都语输入 → 参考：英文
+      return { text: englishText, label: 'English 参考翻译', isRTL: false };
+    }
+  };
+
+  const primaryTranslation = getPrimaryTranslation();
+  const referenceTranslation = getReferenceTranslation();
   const hasOutput = englishText || urduText || chineseText;
 
   return (
@@ -228,7 +228,7 @@ export default function TranslateScreen() {
             乌尔都语翻译
           </ThemedText>
           <ThemedText variant="small" color={theme.textSecondary} style={styles.headerSubtitle}>
-            输入文本，获取英文和乌尔都语翻译
+            输入文本，获取乌尔都语翻译
           </ThemedText>
         </ThemedView>
 
@@ -269,7 +269,7 @@ export default function TranslateScreen() {
             <TextInput
               style={[
                 styles.input,
-                isRTLLanguage(sourceLang) && styles.inputRTL,
+                sourceLang === 'ur' && styles.inputRTL,
               ]}
               placeholder={`输入${languageNames[sourceLang]}文本...`}
               placeholderTextColor={theme.textMuted}
@@ -314,45 +314,66 @@ export default function TranslateScreen() {
           </View>
         )}
 
-        {/* Output Sections - 始终显示两个翻译结果 */}
+        {/* Output Sections */}
         {hasOutput && (
           <View style={styles.resultsContainer}>
-            {outputConfigs.map((config) => (
-              <View key={config.key} style={styles.outputSection}>
-                <View style={styles.outputHeader}>
-                  <View style={styles.outputLabel}>
-                    <View style={styles.outputLabelIcon}>
-                      <FontAwesome6
-                        name={config.key === 'ur' ? 'language' : config.key === 'en' ? 'font' : 'language'}
-                        size={14}
-                        color={theme.primary}
-                      />
-                    </View>
-                    <ThemedText variant="smallMedium" color={theme.textPrimary}>
-                      {config.label}
-                    </ThemedText>
+            {/* 主翻译结果（突出显示） */}
+            <View style={styles.primaryOutputSection}>
+              <View style={styles.primaryOutputHeader}>
+                <View style={styles.primaryOutputLabel}>
+                  <View style={styles.primaryOutputLabelIcon}>
+                    <FontAwesome6 name="language" size={16} color={theme.buttonPrimaryText} />
                   </View>
-                </View>
-                <ThemedView level="default" style={styles.outputContainer}>
-                  <ThemedText
-                    style={[
-                      styles.outputText,
-                      config.isRTL && styles.outputTextRTL,
-                    ]}
-                  >
-                    {config.text || ' '}
+                  <ThemedText variant="title" color={theme.primary}>
+                    {primaryTranslation.label}
                   </ThemedText>
-                  <View style={styles.outputActions}>
-                    <TouchableOpacity
-                      style={styles.inputActionButton}
-                      onPress={() => handleCopy(config.text)}
-                    >
-                      <FontAwesome6 name="copy" size={16} color={theme.textMuted} />
-                    </TouchableOpacity>
-                  </View>
-                </ThemedView>
+                </View>
+                <TouchableOpacity
+                  style={styles.inputActionButton}
+                  onPress={() => handleCopy(primaryTranslation.text)}
+                >
+                  <FontAwesome6 name="copy" size={18} color={theme.primary} />
+                </TouchableOpacity>
               </View>
-            ))}
+              <View style={styles.primaryOutputContainer}>
+                <ThemedText
+                  style={[
+                    styles.primaryOutputText,
+                    primaryTranslation.isRTL && styles.primaryOutputTextRTL,
+                  ]}
+                >
+                  {primaryTranslation.text || ' '}
+                </ThemedText>
+              </View>
+            </View>
+
+            {/* 参考翻译（次要显示） */}
+            <View style={styles.referenceOutputSection}>
+              <View style={styles.referenceLabel}>
+                <FontAwesome6 name="eye" size={12} color={theme.textMuted} />
+                <ThemedText variant="caption" color={theme.textMuted}>
+                  {referenceTranslation.label}
+                </ThemedText>
+              </View>
+              <ThemedView level="default" style={styles.outputContainer}>
+                <ThemedText
+                  style={[
+                    styles.outputText,
+                    referenceTranslation.isRTL && styles.outputTextRTL,
+                  ]}
+                >
+                  {referenceTranslation.text || ' '}
+                </ThemedText>
+                <View style={styles.outputActions}>
+                  <TouchableOpacity
+                    style={styles.inputActionButton}
+                    onPress={() => handleCopy(referenceTranslation.text)}
+                  >
+                    <FontAwesome6 name="copy" size={16} color={theme.textMuted} />
+                  </TouchableOpacity>
+                </View>
+              </ThemedView>
+            </View>
           </View>
         )}
 
@@ -381,8 +402,8 @@ export default function TranslateScreen() {
                         {languageNames[item.sourceLang]}
                       </ThemedText>
                       <FontAwesome6 name="arrow-right" size={10} color={theme.textMuted} />
-                      <ThemedText variant="caption" color={theme.textMuted}>
-                        EN + UR
+                      <ThemedText variant="caption" color={theme.primary}>
+                        اردو
                       </ThemedText>
                     </View>
                     <TouchableOpacity
@@ -401,23 +422,15 @@ export default function TranslateScreen() {
                     {item.sourceText}
                   </ThemedText>
                   <ThemedText
-                    variant="small"
-                    color={theme.textSecondary}
-                    style={styles.historyItemText}
-                    numberOfLines={1}
-                  >
-                    EN: {item.englishText}
-                  </ThemedText>
-                  <ThemedText
-                    variant="small"
-                    color={theme.textSecondary}
+                    variant="smallMedium"
+                    color={theme.primary}
                     style={[
                       styles.historyItemText,
                       styles.historyItemTextRTL,
                     ]}
                     numberOfLines={1}
                   >
-                    UR: {item.urduText}
+                    {item.urduText}
                   </ThemedText>
                 </TouchableOpacity>
               ))}

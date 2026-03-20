@@ -112,6 +112,58 @@ export const createStyles = (theme: Theme) => {
     outputSection: {
       marginBottom: Spacing.sm,
     },
+    // 主翻译结果（乌尔都语）- 突出显示
+    primaryOutputSection: {
+      marginBottom: Spacing.sm,
+    },
+    primaryOutputContainer: {
+      backgroundColor: theme.primary + '10',
+      borderRadius: BorderRadius.lg,
+      borderWidth: 2,
+      borderColor: theme.primary,
+      minHeight: 120,
+      padding: Spacing.lg,
+    },
+    primaryOutputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: Spacing.md,
+    },
+    primaryOutputLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    primaryOutputLabelIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: BorderRadius.md,
+      backgroundColor: theme.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryOutputText: {
+      fontSize: 20,
+      color: theme.textPrimary,
+      lineHeight: 32,
+      fontWeight: '500',
+    },
+    primaryOutputTextRTL: {
+      textAlign: 'right',
+      writingDirection: 'rtl',
+    },
+    // 参考翻译（英文）- 次要显示
+    referenceOutputSection: {
+      marginBottom: Spacing.sm,
+      opacity: 0.8,
+    },
+    referenceLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.xs,
+      marginBottom: Spacing.sm,
+    },
     outputHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -127,7 +179,7 @@ export const createStyles = (theme: Theme) => {
       width: 32,
       height: 32,
       borderRadius: BorderRadius.md,
-      backgroundColor: theme.primary + '15',
+      backgroundColor: theme.backgroundTertiary,
       alignItems: 'center',
       justifyContent: 'center',
     },
