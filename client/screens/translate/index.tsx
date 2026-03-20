@@ -20,6 +20,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
 import { createStyles } from './styles';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { TargetLanguageModal } from '@/components/LanguageSelector';
 import { LearningModule } from '@/components/LearningModule';
 import {
   LanguageCode,
@@ -64,6 +65,7 @@ export default function TranslateScreen() {
   const [isPlayingPrimary, setIsPlayingPrimary] = useState(false);
   const [isPlayingSecondary, setIsPlayingSecondary] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
+  const [showTargetLangModal, setShowTargetLangModal] = useState(false);
 
   // 引用
   const recordingRef = useRef<Audio.Recording | null>(null);
@@ -369,51 +371,48 @@ export default function TranslateScreen() {
           </ThemedText>
         </ThemedView>
 
-        {/* Language Selector - 三语言选择器 */}
-        <View style={styles.languageSelectorContainer}>
-          {/* 第一语言（支持自动检测） */}
-          <View style={styles.langSelectorItem}>
-            <LanguageSelector
-              value={sourceLang}
-              onChange={setSourceLang}
-              label="源语言"
-              showAutoDetect={true}
-              excludeLanguages={[]}
-            />
-          </View>
+        {/* Language Selector - 简洁形式：源语言 → 目标语言组合 */}
+        <View style={styles.languageSelector}>
+          {/* 源语言选择 */}
+          <LanguageSelector
+            value={sourceLang}
+            onChange={setSourceLang}
+            showAutoDetect={true}
+            excludeLanguages={[]}
+          />
 
           {/* 箭头 */}
-          <View style={styles.arrowContainer}>
-            <FontAwesome6 name="arrow-right" size={16} color="#6B5B95" />
+          <View style={styles.arrowButton}>
+            <FontAwesome6 name="arrow-right-arrow-left" size={16} color="#FFFFFF" />
           </View>
 
-          {/* 第二语言 */}
-          <View style={styles.langSelectorItem}>
-            <LanguageSelector
-              value={primaryLang}
-              onChange={setPrimaryLang}
-              label="主翻译"
-              showAutoDetect={false}
-              excludeLanguages={[sourceLang === 'auto' ? 'en' : sourceLang, secondaryLang]}
-            />
-          </View>
-
-          {/* 箭头 */}
-          <View style={styles.arrowContainer}>
-            <FontAwesome6 name="arrow-right" size={16} color="#6B5B95" />
-          </View>
-
-          {/* 第三语言 */}
-          <View style={styles.langSelectorItem}>
-            <LanguageSelector
-              value={secondaryLang}
-              onChange={setSecondaryLang}
-              label="参考翻译"
-              showAutoDetect={false}
-              excludeLanguages={[sourceLang === 'auto' ? 'en' : sourceLang, primaryLang]}
-            />
-          </View>
+          {/* 目标语言组合 */}
+          <TouchableOpacity
+            style={styles.targetLangButton}
+            onPress={() => {
+              // 显示Modal让用户选择两种目标语言
+              setShowTargetLangModal(true);
+            }}
+          >
+            <ThemedText style={styles.targetLangText}>
+              {getLanguageByCode(primaryLang).nativeName} + {getLanguageByCode(secondaryLang).nativeName}
+            </ThemedText>
+            <FontAwesome6 name="chevron-down" size={10} color="#666666" />
+          </TouchableOpacity>
         </View>
+
+        {/* 目标语言选择Modal */}
+        {showTargetLangModal && (
+          <TargetLanguageModal
+            visible={showTargetLangModal}
+            primaryLang={primaryLang}
+            secondaryLang={secondaryLang}
+            onPrimaryChange={setPrimaryLang}
+            onSecondaryChange={setSecondaryLang}
+            onClose={() => setShowTargetLangModal(false)}
+            excludeLangs={[sourceLang === 'auto' ? 'zh' : sourceLang]}
+          />
+        )}
 
         {/* Input Section */}
         <View style={styles.inputSection}>

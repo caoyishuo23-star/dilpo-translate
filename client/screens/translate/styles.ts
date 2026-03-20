@@ -36,24 +36,47 @@ export const createStyles = (theme: Theme) => {
       textAlign: 'center',
       color: 'rgba(255,255,255,0.85)', // 半透明白色
     },
-    // 语言选择器 - 三语言形式
-    languageSelectorContainer: {
+    // 语言选择器 - 简洁形式
+    languageSelector: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       marginBottom: Spacing.lg,
+      gap: Spacing.sm,
       backgroundColor: '#FFFFFF',
       borderRadius: BorderRadius.xl,
       padding: Spacing.sm,
       borderWidth: 1,
       borderColor: '#E8E8E8',
     },
-    langSelectorItem: {
-      flex: 1,
+    arrowButton: {
+      width: 40,
+      height: 40,
+      borderRadius: BorderRadius.full,
+      backgroundColor: '#8B7DB8',
       alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#8B7DB8',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
     },
-    arrowContainer: {
-      paddingHorizontal: Spacing.xs,
+    targetLangButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.xs,
+      paddingVertical: Spacing.sm + 2,
+      paddingHorizontal: Spacing.md,
+      backgroundColor: '#F5F5F5',
+      borderRadius: BorderRadius.lg,
+    },
+    targetLangText: {
+      color: '#666666',
+      fontSize: 14,
+      fontWeight: '500',
     },
     // 检测语言提示
     detectedLangInfo: {
@@ -70,75 +93,6 @@ export const createStyles = (theme: Theme) => {
     detectedLangText: {
       color: '#6B5B95',
       fontSize: 13,
-    },
-    langSelectButton: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: Spacing.xs,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.md,
-      backgroundColor: '#F8F5FF',
-      borderRadius: BorderRadius.lg,
-    },
-    langSelectText: {
-      color: '#6B5B95',
-      fontSize: 15,
-      fontWeight: '600',
-    },
-    swapButton: {
-      width: 44,
-      height: 44,
-      borderRadius: BorderRadius.full,
-      backgroundColor: '#6B5B95',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginHorizontal: Spacing.xs,
-      shadowColor: '#6B5B95',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    targetLangButton: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.md,
-      backgroundColor: '#F5F5F5',
-      borderRadius: BorderRadius.lg,
-    },
-    targetLangText: {
-      color: '#666666',
-      fontSize: 14,
-      fontWeight: '500',
-    },
-    languageButton: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#FFFFFF',
-      paddingVertical: Spacing.sm + 2,
-      paddingHorizontal: Spacing.md,
-      borderRadius: BorderRadius.lg,
-      borderWidth: 1,
-      borderColor: '#E8E8E8',
-      gap: Spacing.xs,
-    },
-    languageButtonActive: {
-      borderColor: '#C4B5E8', // 淡紫色边框
-      backgroundColor: '#F8F5FF', // 更浅的紫色背景
-    },
-    languageButtonText: {
-      color: '#666666',
-      fontSize: 13,
-    },
-    languageButtonTextActive: {
-      color: '#6B5B95', // 清晰的紫色文字
-      fontWeight: '600',
     },
     // 输入区域
     inputSection: {
