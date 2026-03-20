@@ -162,23 +162,26 @@ export const createStyles = (theme: Theme) => {
       fontSize: 15,
     },
     // 结果区域
+    resultsWrapper: {
+      backgroundColor: '#F8F5FF',
+      borderRadius: BorderRadius.xl,
+      padding: Spacing.md,
+      borderWidth: 2,
+      borderColor: '#E8E0F0',
+    },
     resultsContainer: {
       gap: Spacing.md,
     },
     // 主翻译结果（第二语言）
     primaryOutputSection: {
-      backgroundColor: '#FAFAFA',
-      borderRadius: BorderRadius.xl,
-      padding: Spacing.lg,
-      borderWidth: 1,
-      borderColor: '#F0EBFF',
+      backgroundColor: '#FFFFFF',
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
     },
     secondaryOutputSection: {
-      backgroundColor: '#FAFAFA',
-      borderRadius: BorderRadius.xl,
-      padding: Spacing.lg,
-      borderWidth: 1,
-      borderColor: '#E8F5E9',
+      backgroundColor: '#FFFFFF',
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
     },
     outputHeader: {
       flexDirection: 'row',

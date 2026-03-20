@@ -481,33 +481,24 @@ export default function TranslateScreen() {
           </View>
         )}
 
-        {/* Detected Language Info */}
-        {detectedLang && sourceLang === 'auto' && (
-          <View style={styles.detectedLangInfo}>
-            <FontAwesome6 name="wand-magic-sparkles" size={14} color="#6B5B95" />
-            <ThemedText style={styles.detectedLangText}>
-              检测到语言: {getLanguageByCode(detectedLang).nativeName}
-            </ThemedText>
-          </View>
-        )}
-
         {/* Output Sections */}
         {hasOutput && (
-          <View style={styles.resultsContainer}>
-            {/* 主翻译结果 */}
-            <View style={styles.primaryOutputSection}>
-              <View style={styles.outputHeader}>
-                <ThemedText style={styles.outputLangLabel}>
-                  {primaryLangInfo.nativeName}
-                </ThemedText>
-                <View style={styles.outputActions}>
-                  <TouchableOpacity
-                    style={styles.outputActionButton}
-                    onPress={() => playTTS(primaryText, primaryLang, true)}
-                  >
-                    <FontAwesome6 
-                      name={isPlayingPrimary ? "stop" : "volume-high"} 
-                      size={14} 
+          <View style={styles.resultsWrapper}>
+            <View style={styles.resultsContainer}>
+              {/* 主翻译结果 */}
+              <View style={styles.primaryOutputSection}>
+                <View style={styles.outputHeader}>
+                  <ThemedText style={styles.outputLangLabel}>
+                    {primaryLangInfo.nativeName}
+                  </ThemedText>
+                  <View style={styles.outputActions}>
+                    <TouchableOpacity
+                      style={styles.outputActionButton}
+                      onPress={() => playTTS(primaryText, primaryLang, true)}
+                    >
+                      <FontAwesome6 
+                        name={isPlayingPrimary ? "stop" : "volume-high"} 
+                        size={14} 
                       color="#6B5B95" 
                     />
                   </TouchableOpacity>
@@ -564,6 +555,7 @@ export default function TranslateScreen() {
               </ThemedText>
             </View>
           </View>
+        </View>
         )}
 
         {/* History Section */}
