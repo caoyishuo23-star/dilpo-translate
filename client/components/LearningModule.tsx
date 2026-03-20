@@ -3,6 +3,7 @@ import {
   View,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { ThemedText } from './ThemedText';
@@ -39,6 +40,9 @@ interface LearningModuleProps {
   recentWords?: string[];
 }
 
+// 默认显示的最大高度（约20行）
+const DEFAULT_MAX_HEIGHT = 320;
+
 export function LearningModule({ primaryLang, recentWords = [] }: LearningModuleProps) {
   const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<PhraseCategory | null>(null);
@@ -47,6 +51,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
   const [ieltSentences, setIeltSentences] = useState<IELTSSentence[]>([]);
   const [isLoadingIELTS, setIsLoadingIELTS] = useState(false);
   const [activeTab, setActiveTab] = useState<'phrases' | 'ielts'>('phrases');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const langInfo = getLanguageByCode(primaryLang);
   const phrases = getPhrasesForLanguage(primaryLang);
@@ -66,6 +71,11 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
       fetchIELTSSentences();
     }
   }, [recentWords, activeTab, isEnglish]);
+
+  // 切换Tab时重置展开状态
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [activeTab]);
 
   const fetchRelatedSentences = async () => {
     if (recentWords.length === 0) return;
@@ -126,14 +136,14 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: Spacing.xs,
-      marginBottom: Spacing.md,
+      marginBottom: Spacing.sm,
     }}>
       {phrases.map((cat) => (
         <TouchableOpacity
           key={cat.category}
           style={{
-            paddingVertical: Spacing.xs + 2,
-            paddingHorizontal: Spacing.md,
+            paddingVertical: Spacing.xs,
+            paddingHorizontal: Spacing.sm,
             borderRadius: BorderRadius.full,
             backgroundColor: selectedCategory === cat.category ? '#8B7DB8' : '#F5F5F5',
             borderWidth: 1,
@@ -145,7 +155,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         >
           <ThemedText
             style={{
-              fontSize: 12,
+              fontSize: 11,
               color: selectedCategory === cat.category ? '#FFFFFF' : '#666666',
             }}
           >
@@ -164,8 +174,8 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
 
     if (isLoadingRelated) {
       return (
-        <View style={{ alignItems: 'center', paddingVertical: Spacing.md }}>
-          <ActivityIndicator color="#8B7DB8" size="small" />
+        <View style={{ alignItems: 'center', paddingVertical: Spacing.sm }}>
+          <ActivityIndicator color="#F59E0B" size="small" />
         </View>
       );
     }
@@ -175,19 +185,19 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
     }
 
     return (
-      <View style={{ marginBottom: Spacing.lg }}>
+      <View style={{ marginBottom: Spacing.md }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             gap: Spacing.xs,
-            marginBottom: Spacing.sm,
+            marginBottom: Spacing.xs,
           }}
         >
-          <FontAwesome6 name="lightbulb" size={12} color="#F59E0B" />
+          <FontAwesome6 name="lightbulb" size={11} color="#F59E0B" />
           <ThemedText
             style={{
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: '600',
               color: '#F59E0B',
             }}
@@ -201,24 +211,23 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             style={{
               flexDirection: 'row',
               alignItems: 'flex-start',
-              paddingVertical: Spacing.sm,
+              paddingVertical: Spacing.xs + 2,
               borderBottomWidth: 1,
-              borderBottomColor: '#F0F0F0',
+              borderBottomColor: '#F5F5F5',
             }}
           >
             <View style={{ flex: 1 }}>
               <ThemedText
                 style={{
-                  fontSize: 14,
+                  fontSize: 12,
                   color: '#1A1A2E',
-                  marginBottom: 2,
                 }}
               >
                 {item.source}
               </ThemedText>
               <ThemedText
                 style={{
-                  fontSize: 15,
+                  fontSize: 13,
                   fontWeight: '600',
                   color: '#6B5B95',
                   textAlign: langInfo.isRTL ? 'right' : 'left',
@@ -230,12 +239,12 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             <View
               style={{
                 backgroundColor: '#FEF3C7',
-                paddingVertical: 2,
-                paddingHorizontal: Spacing.sm,
+                paddingVertical: 1,
+                paddingHorizontal: Spacing.xs,
                 borderRadius: BorderRadius.sm,
               }}
             >
-              <ThemedText style={{ fontSize: 10, color: '#F59E0B' }}>
+              <ThemedText style={{ fontSize: 9, color: '#F59E0B' }}>
                 {item.word}
               </ThemedText>
             </View>
@@ -258,13 +267,13 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             flexDirection: 'row',
             alignItems: 'center',
             gap: Spacing.xs,
-            marginBottom: Spacing.sm,
+            marginBottom: Spacing.xs,
           }}
         >
-          <FontAwesome6 name="comments" size={12} color="#8B7DB8" />
+          <FontAwesome6 name="comments" size={11} color="#8B7DB8" />
           <ThemedText
             style={{
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: '600',
               color: '#6B5B95',
             }}
@@ -274,13 +283,13 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         </View>
         {renderCategorySelector()}
         {displayPhrases.map((cat) => (
-          <View key={cat.category} style={{ marginBottom: Spacing.md }}>
+          <View key={cat.category} style={{ marginBottom: Spacing.sm }}>
             <ThemedText
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: '500',
                 color: '#999999',
-                marginBottom: Spacing.sm,
+                marginBottom: Spacing.xs,
               }}
             >
               {categoryNames[cat.category]}
@@ -291,43 +300,30 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
                 style={{
                   flexDirection: 'row',
                   alignItems: 'flex-start',
-                  paddingVertical: Spacing.sm,
+                  paddingVertical: Spacing.xs + 2,
                   borderBottomWidth: 1,
-                  borderBottomColor: '#F0F0F0',
+                  borderBottomColor: '#F5F5F5',
                 }}
               >
                 <View style={{ flex: 1 }}>
                   <ThemedText
                     style={{
-                      fontSize: 14,
+                      fontSize: 12,
                       color: '#1A1A2E',
-                      marginBottom: 2,
                     }}
                   >
                     {phrase.source}
                   </ThemedText>
                   <ThemedText
                     style={{
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: '600',
                       color: '#6B5B95',
-                      marginBottom: phrase.pronunciation ? 2 : 0,
                       textAlign: langInfo.isRTL ? 'right' : 'left',
                     }}
                   >
                     {phrase.target}
                   </ThemedText>
-                  {phrase.pronunciation && (
-                    <ThemedText
-                      style={{
-                        fontSize: 11,
-                        color: '#999999',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      {phrase.pronunciation}
-                    </ThemedText>
-                  )}
                 </View>
               </View>
             ))}
@@ -344,13 +340,13 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         <View
           style={{
             alignItems: 'center',
-            paddingVertical: Spacing.xl,
+            paddingVertical: Spacing.lg,
           }}
         >
-          <FontAwesome6 name="book-open" size={32} color="#CCCCCC" />
+          <FontAwesome6 name="book-open" size={28} color="#CCCCCC" />
           <ThemedText
             style={{
-              fontSize: 13,
+              fontSize: 12,
               color: '#999999',
               marginTop: Spacing.sm,
               textAlign: 'center',
@@ -364,9 +360,9 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
 
     if (isLoadingIELTS) {
       return (
-        <View style={{ alignItems: 'center', paddingVertical: Spacing.xl }}>
+        <View style={{ alignItems: 'center', paddingVertical: Spacing.lg }}>
           <ActivityIndicator color="#8B7DB8" />
-          <ThemedText style={{ fontSize: 13, color: '#999999', marginTop: Spacing.sm }}>
+          <ThemedText style={{ fontSize: 12, color: '#999999', marginTop: Spacing.sm }}>
             正在生成雅思真题句子...
           </ThemedText>
         </View>
@@ -380,10 +376,10 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             key={index}
             style={{
               backgroundColor: '#FAF8FF',
-              borderRadius: BorderRadius.lg,
-              padding: Spacing.md,
+              borderRadius: BorderRadius.md,
+              padding: Spacing.sm,
               marginBottom: Spacing.sm,
-              borderLeftWidth: 3,
+              borderLeftWidth: 2,
               borderLeftColor: '#8B7DB8',
             }}
           >
@@ -397,21 +393,21 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
               <View
                 style={{
                   backgroundColor: '#8B7DB8',
-                  paddingVertical: 2,
-                  paddingHorizontal: Spacing.sm,
+                  paddingVertical: 1,
+                  paddingHorizontal: Spacing.xs,
                   borderRadius: BorderRadius.sm,
                 }}
               >
-                <ThemedText style={{ fontSize: 10, color: '#FFFFFF', fontWeight: '600' }}>
+                <ThemedText style={{ fontSize: 9, color: '#FFFFFF', fontWeight: '600' }}>
                   {item.type}
                 </ThemedText>
               </View>
             </View>
             <ThemedText
               style={{
-                fontSize: 14,
+                fontSize: 12,
                 color: '#1A1A2E',
-                lineHeight: 22,
+                lineHeight: 18,
                 marginBottom: Spacing.xs,
               }}
             >
@@ -419,9 +415,9 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             </ThemedText>
             <ThemedText
               style={{
-                fontSize: 12,
+                fontSize: 11,
                 color: '#666666',
-                lineHeight: 18,
+                lineHeight: 16,
               }}
             >
               {item.translation}
@@ -432,7 +428,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   gap: Spacing.xs,
-                  marginTop: Spacing.sm,
+                  marginTop: Spacing.xs,
                 }}
               >
                 {item.vocabulary.map((word, i) => (
@@ -440,12 +436,12 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
                     key={i}
                     style={{
                       backgroundColor: '#F0EBFF',
-                      paddingVertical: 2,
-                      paddingHorizontal: Spacing.sm,
+                      paddingVertical: 1,
+                      paddingHorizontal: Spacing.xs,
                       borderRadius: BorderRadius.sm,
                     }}
                   >
-                    <ThemedText style={{ fontSize: 11, color: '#6B5B95' }}>
+                    <ThemedText style={{ fontSize: 10, color: '#6B5B95' }}>
                       {word}
                     </ThemedText>
                   </View>
@@ -458,24 +454,50 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
     );
   };
 
+  // 展开按钮
+  const renderExpandButton = () => (
+    <TouchableOpacity
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: Spacing.xs,
+        paddingVertical: Spacing.sm,
+        marginTop: Spacing.xs,
+        borderTopWidth: 1,
+        borderTopColor: '#F0F0F0',
+      }}
+      onPress={() => setIsExpanded(!isExpanded)}
+    >
+      <ThemedText style={{ fontSize: 12, color: '#8B7DB8' }}>
+        {isExpanded ? '收起' : '...展开更多'}
+      </ThemedText>
+      <FontAwesome6 
+        name={isExpanded ? 'chevron-up' : 'chevron-down'} 
+        size={10} 
+        color="#8B7DB8" 
+      />
+    </TouchableOpacity>
+  );
+
   if (phrases.length === 0 && !isEnglish) {
     return null;
   }
 
   return (
-    <View style={{ marginTop: Spacing.xl }}>
+    <View style={{ marginTop: Spacing.lg }}>
       {/* 标题 */}
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: Spacing.md,
+          marginBottom: Spacing.sm,
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm }}>
-          <FontAwesome6 name="battery-full" size={18} color="#8B7DB8" />
-          <ThemedText style={{ fontSize: 16, fontWeight: '600', color: '#1A1A2E' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.xs }}>
+          <FontAwesome6 name="battery-full" size={16} color="#8B7DB8" />
+          <ThemedText style={{ fontSize: 15, fontWeight: '600', color: '#1A1A2E' }}>
             充电小站
           </ThemedText>
         </View>
@@ -486,17 +508,17 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         <View
           style={{
             flexDirection: 'row',
-            marginBottom: Spacing.md,
+            marginBottom: Spacing.sm,
             backgroundColor: '#F5F5F5',
-            borderRadius: BorderRadius.lg,
-            padding: 3,
+            borderRadius: BorderRadius.md,
+            padding: 2,
           }}
         >
           <TouchableOpacity
             style={{
               flex: 1,
-              paddingVertical: Spacing.sm,
-              borderRadius: BorderRadius.md,
+              paddingVertical: Spacing.xs + 2,
+              borderRadius: BorderRadius.sm,
               backgroundColor: activeTab === 'phrases' ? '#FFFFFF' : 'transparent',
               alignItems: 'center',
             }}
@@ -504,7 +526,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
           >
             <ThemedText
               style={{
-                fontSize: 13,
+                fontSize: 12,
                 color: activeTab === 'phrases' ? '#6B5B95' : '#666666',
                 fontWeight: activeTab === 'phrases' ? '600' : '400',
               }}
@@ -515,8 +537,8 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
           <TouchableOpacity
             style={{
               flex: 1,
-              paddingVertical: Spacing.sm,
-              borderRadius: BorderRadius.md,
+              paddingVertical: Spacing.xs + 2,
+              borderRadius: BorderRadius.sm,
               backgroundColor: activeTab === 'ielts' ? '#FFFFFF' : 'transparent',
               alignItems: 'center',
             }}
@@ -524,7 +546,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
           >
             <ThemedText
               style={{
-                fontSize: 13,
+                fontSize: 12,
                 color: activeTab === 'ielts' ? '#6B5B95' : '#666666',
                 fontWeight: activeTab === 'ielts' ? '600' : '400',
               }}
@@ -535,23 +557,32 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         </View>
       )}
 
-      {/* 内容区域 */}
+      {/* 内容区域 - 固定高度限制 */}
       <ThemedView
         level="default"
         style={{
-          borderRadius: BorderRadius.xl,
-          padding: Spacing.lg,
+          borderRadius: BorderRadius.lg,
+          padding: Spacing.md,
           backgroundColor: '#FFFFFF',
         }}
       >
-        {activeTab === 'phrases' ? (
-          <>
-            {renderRelatedSentences()}
-            {renderDailyPhrases()}
-          </>
-        ) : (
-          renderIELTS()
-        )}
+        <View style={{ maxHeight: isExpanded ? undefined : DEFAULT_MAX_HEIGHT }}>
+          <ScrollView 
+            scrollEnabled={isExpanded}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+          >
+            {activeTab === 'phrases' ? (
+              <>
+                {renderRelatedSentences()}
+                {renderDailyPhrases()}
+              </>
+            ) : (
+              renderIELTS()
+            )}
+          </ScrollView>
+        </View>
+        {renderExpandButton()}
       </ThemedView>
     </View>
   );
