@@ -319,22 +319,27 @@ export default function TranslateScreen() {
           <View style={styles.resultsContainer}>
             {/* 主翻译结果（突出显示） */}
             <View style={styles.primaryOutputSection}>
+              {/* 深色标题行 */}
               <View style={styles.primaryOutputHeader}>
                 <View style={styles.primaryOutputLabel}>
                   <View style={styles.primaryOutputLabelIcon}>
-                    <FontAwesome6 name="language" size={16} color={theme.buttonPrimaryText} />
+                    <FontAwesome6 name="language" size={12} color="#FFFFFF" />
                   </View>
-                  <ThemedText variant="title" color={theme.primary}>
-                    {primaryTranslation.label}
-                  </ThemedText>
+                  <View style={styles.primaryOutputLangTag}>
+                    <ThemedText variant="captionMedium" color="#FFFFFF">
+                      PK 乌尔都语 / اردو
+                    </ThemedText>
+                  </View>
                 </View>
                 <TouchableOpacity
-                  style={styles.inputActionButton}
+                  style={styles.primaryCopyButton}
                   onPress={() => handleCopy(primaryTranslation.text)}
                 >
-                  <FontAwesome6 name="copy" size={18} color={theme.primary} />
+                  <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
+                  <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
                 </TouchableOpacity>
               </View>
+              {/* 浅色内容区 */}
               <View style={styles.primaryOutputContainer}>
                 <ThemedText
                   style={[
@@ -349,13 +354,28 @@ export default function TranslateScreen() {
 
             {/* 参考翻译（次要显示） */}
             <View style={styles.referenceOutputSection}>
-              <View style={styles.referenceLabel}>
-                <FontAwesome6 name="eye" size={12} color={theme.textMuted} />
-                <ThemedText variant="caption" color={theme.textMuted}>
-                  {referenceTranslation.label}
-                </ThemedText>
+              {/* 深色标题行 */}
+              <View style={styles.referenceOutputHeader}>
+                <View style={styles.referenceOutputLabel}>
+                  <View style={styles.referenceOutputLabelIcon}>
+                    <FontAwesome6 name="eye" size={12} color="#FFFFFF" />
+                  </View>
+                  <View style={styles.referenceTag}>
+                    <ThemedText variant="captionMedium" color="#FFFFFF">
+                      EN 英文 / English
+                    </ThemedText>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={styles.primaryCopyButton}
+                  onPress={() => handleCopy(referenceTranslation.text)}
+                >
+                  <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
+                  <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
+                </TouchableOpacity>
               </View>
-              <ThemedView level="default" style={styles.outputContainer}>
+              {/* 浅色内容区 */}
+              <View style={styles.referenceOutputContainer}>
                 <ThemedText
                   style={[
                     styles.outputText,
@@ -364,15 +384,7 @@ export default function TranslateScreen() {
                 >
                   {referenceTranslation.text || ' '}
                 </ThemedText>
-                <View style={styles.outputActions}>
-                  <TouchableOpacity
-                    style={styles.inputActionButton}
-                    onPress={() => handleCopy(referenceTranslation.text)}
-                  >
-                    <FontAwesome6 name="copy" size={16} color={theme.textMuted} />
-                  </TouchableOpacity>
-                </View>
-              </ThemedView>
+              </View>
             </View>
           </View>
         )}

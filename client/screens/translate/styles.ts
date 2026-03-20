@@ -115,20 +115,23 @@ export const createStyles = (theme: Theme) => {
     // 主翻译结果（乌尔都语）- 突出显示
     primaryOutputSection: {
       marginBottom: Spacing.sm,
+      borderRadius: BorderRadius.xl,
+      overflow: 'hidden',
+      // 有色阴影
+      shadowColor: theme.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 4,
     },
-    primaryOutputContainer: {
-      backgroundColor: theme.primary + '10',
-      borderRadius: BorderRadius.lg,
-      borderWidth: 2,
-      borderColor: theme.primary,
-      minHeight: 120,
-      padding: Spacing.lg,
-    },
+    // 深色标题行
     primaryOutputHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: Spacing.md,
+      backgroundColor: theme.primary,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
     },
     primaryOutputLabel: {
       flexDirection: 'row',
@@ -136,12 +139,24 @@ export const createStyles = (theme: Theme) => {
       gap: Spacing.sm,
     },
     primaryOutputLabelIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: BorderRadius.md,
-      backgroundColor: theme.primary,
+      width: 28,
+      height: 28,
+      borderRadius: BorderRadius.sm,
+      backgroundColor: 'rgba(255,255,255,0.2)',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    primaryOutputLangTag: {
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      paddingVertical: 2,
+      paddingHorizontal: Spacing.sm,
+      borderRadius: BorderRadius.sm,
+    },
+    // 浅色内容区
+    primaryOutputContainer: {
+      backgroundColor: '#EEF2FF', // 浅蓝紫色背景
+      padding: Spacing.lg,
+      minHeight: 100,
     },
     primaryOutputText: {
       fontSize: 20,
@@ -153,10 +168,62 @@ export const createStyles = (theme: Theme) => {
       textAlign: 'right',
       writingDirection: 'rtl',
     },
+    primaryCopyButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.xs,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.lg,
+    },
     // 参考翻译（英文）- 次要显示
     referenceOutputSection: {
       marginBottom: Spacing.sm,
-      opacity: 0.8,
+      borderRadius: BorderRadius.xl,
+      overflow: 'hidden',
+      shadowColor: '#10B981',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 2,
+    },
+    referenceOutputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: '#059669', // 翠绿色
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+    },
+    referenceOutputLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    referenceOutputLabelIcon: {
+      width: 28,
+      height: 28,
+      borderRadius: BorderRadius.sm,
+      backgroundColor: 'rgba(255,255,255,0.2)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    referenceOutputContainer: {
+      backgroundColor: '#ECFDF5', // 浅绿色背景
+      padding: Spacing.lg,
+    },
+    referenceLabelText: {
+      color: '#FFFFFF',
+    },
+    referenceTag: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.xs,
+      backgroundColor: 'rgba(255,255,255,0.25)',
+      paddingVertical: 2,
+      paddingHorizontal: Spacing.sm,
+      borderRadius: BorderRadius.sm,
     },
     referenceLabel: {
       flexDirection: 'row',
