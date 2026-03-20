@@ -10,15 +10,15 @@ export const createStyles = (theme: Theme) => {
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing['2xl'],
+      paddingTop: Spacing.xl,
       paddingBottom: Spacing['4xl'],
     },
     header: {
-      marginBottom: Spacing.xl,
+      marginBottom: Spacing.lg,
     },
     headerTitle: {
       textAlign: 'center',
-      marginBottom: Spacing.xs,
+      marginBottom: 2,
     },
     headerSubtitle: {
       textAlign: 'center',
@@ -26,7 +26,7 @@ export const createStyles = (theme: Theme) => {
     // 语言选择器
     languageSelector: {
       flexDirection: 'row',
-      marginBottom: Spacing.xl,
+      marginBottom: Spacing.lg,
       gap: Spacing.sm,
     },
     languageButton: {
@@ -35,22 +35,23 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.backgroundDefault,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
+      paddingVertical: Spacing.sm + 2,
+      paddingHorizontal: Spacing.md,
       borderRadius: BorderRadius.lg,
       borderWidth: 1,
       borderColor: theme.border,
-      gap: Spacing.sm,
+      gap: Spacing.xs,
     },
     languageButtonActive: {
-      borderColor: theme.primary,
-      backgroundColor: theme.primary + '15',
+      borderColor: '#B8A9E8',
+      backgroundColor: '#F5F0FF',
     },
     languageButtonText: {
-      color: theme.textPrimary,
+      color: theme.textSecondary,
+      fontSize: 13,
     },
     languageButtonTextActive: {
-      color: theme.primary,
+      color: '#7C5DC4',
       fontWeight: '600',
     },
     // 输入区域
@@ -65,12 +66,12 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.lg,
       borderWidth: 1,
       borderColor: theme.border,
-      minHeight: 120,
+      minHeight: 60, // 默认约2行
     },
     input: {
       flex: 1,
-      padding: Spacing.lg,
-      fontSize: 16,
+      padding: Spacing.md,
+      fontSize: 15,
       color: theme.textPrimary,
       textAlignVertical: 'top',
     },
@@ -91,23 +92,28 @@ export const createStyles = (theme: Theme) => {
     },
     // 翻译按钮
     translateButton: {
-      backgroundColor: theme.primary,
-      paddingVertical: Spacing.lg,
+      backgroundColor: '#B8A9E8', // 马卡龙紫色
+      paddingVertical: Spacing.md,
       borderRadius: BorderRadius.lg,
       alignItems: 'center',
-      marginBottom: Spacing.xl,
+      marginBottom: Spacing.lg,
+      shadowColor: '#B8A9E8',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 6,
+      elevation: 2,
     },
     translateButtonDisabled: {
       opacity: 0.6,
     },
     translateButtonText: {
-      color: theme.buttonPrimaryText,
+      color: '#FFFFFF',
       fontWeight: '600',
-      fontSize: 16,
+      fontSize: 15,
     },
     // 结果区域
     resultsContainer: {
-      gap: Spacing.lg,
+      gap: Spacing.md,
     },
     outputSection: {
       marginBottom: Spacing.sm,
@@ -117,20 +123,20 @@ export const createStyles = (theme: Theme) => {
       marginBottom: Spacing.sm,
       borderRadius: BorderRadius.xl,
       overflow: 'hidden',
-      // 有色阴影
-      shadowColor: theme.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 4,
+      // 马卡龙色阴影
+      shadowColor: '#B8A9E8', // 淡紫色阴影
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 3,
     },
     // 深色标题行
     primaryOutputHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: theme.primary,
-      paddingVertical: Spacing.md,
+      backgroundColor: '#A99BE8', // 马卡龙紫色
+      paddingVertical: Spacing.sm + 2,
       paddingHorizontal: Spacing.lg,
     },
     primaryOutputLabel: {
@@ -139,30 +145,30 @@ export const createStyles = (theme: Theme) => {
       gap: Spacing.sm,
     },
     primaryOutputLabelIcon: {
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       borderRadius: BorderRadius.sm,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: 'rgba(255,255,255,0.3)',
       alignItems: 'center',
       justifyContent: 'center',
     },
     primaryOutputLangTag: {
-      backgroundColor: 'rgba(255,255,255,0.25)',
+      backgroundColor: 'rgba(255,255,255,0.3)',
       paddingVertical: 2,
       paddingHorizontal: Spacing.sm,
       borderRadius: BorderRadius.sm,
     },
     // 浅色内容区
     primaryOutputContainer: {
-      backgroundColor: '#EEF2FF', // 浅蓝紫色背景
+      backgroundColor: '#F5F0FF', // 马卡龙浅紫色背景
       padding: Spacing.lg,
-      minHeight: 100,
+      minHeight: 80,
     },
     primaryOutputText: {
-      fontSize: 20,
+      fontSize: 18,
       color: theme.textPrimary,
-      lineHeight: 32,
-      fontWeight: '500',
+      lineHeight: 28,
+      fontWeight: '600', // 乌尔都语加深
     },
     primaryOutputTextRTL: {
       textAlign: 'right',
@@ -172,7 +178,7 @@ export const createStyles = (theme: Theme) => {
       flexDirection: 'row',
       alignItems: 'center',
       gap: Spacing.xs,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: 'rgba(255,255,255,0.3)',
       paddingVertical: Spacing.xs,
       paddingHorizontal: Spacing.md,
       borderRadius: BorderRadius.lg,
@@ -182,18 +188,18 @@ export const createStyles = (theme: Theme) => {
       marginBottom: Spacing.sm,
       borderRadius: BorderRadius.xl,
       overflow: 'hidden',
-      shadowColor: '#10B981',
+      shadowColor: '#A8D8B8', // 马卡龙绿色阴影
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
       elevation: 2,
     },
     referenceOutputHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#059669', // 翠绿色
-      paddingVertical: Spacing.md,
+      backgroundColor: '#98C9A8', // 马卡龙绿色
+      paddingVertical: Spacing.sm + 2,
       paddingHorizontal: Spacing.lg,
     },
     referenceOutputLabel: {
@@ -202,16 +208,16 @@ export const createStyles = (theme: Theme) => {
       gap: Spacing.sm,
     },
     referenceOutputLabelIcon: {
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       borderRadius: BorderRadius.sm,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: 'rgba(255,255,255,0.3)',
       alignItems: 'center',
       justifyContent: 'center',
     },
     referenceOutputContainer: {
-      backgroundColor: '#ECFDF5', // 浅绿色背景
-      padding: Spacing.lg,
+      backgroundColor: '#F0F8F2', // 马卡龙浅绿色背景
+      padding: Spacing.md,
     },
     referenceLabelText: {
       color: '#FFFFFF',
@@ -220,7 +226,7 @@ export const createStyles = (theme: Theme) => {
       flexDirection: 'row',
       alignItems: 'center',
       gap: Spacing.xs,
-      backgroundColor: 'rgba(255,255,255,0.25)',
+      backgroundColor: 'rgba(255,255,255,0.3)',
       paddingVertical: 2,
       paddingHorizontal: Spacing.sm,
       borderRadius: BorderRadius.sm,
@@ -250,6 +256,15 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       justifyContent: 'center',
     },
+    outputText: {
+      fontSize: 14,
+      color: theme.textPrimary,
+      lineHeight: 22,
+    },
+    outputTextRTL: {
+      textAlign: 'right',
+      writingDirection: 'rtl',
+    },
     outputContainer: {
       backgroundColor: theme.backgroundDefault,
       borderRadius: BorderRadius.lg,
@@ -257,15 +272,6 @@ export const createStyles = (theme: Theme) => {
       borderColor: theme.border,
       minHeight: 100,
       padding: Spacing.lg,
-    },
-    outputText: {
-      fontSize: 16,
-      color: theme.textPrimary,
-      lineHeight: 24,
-    },
-    outputTextRTL: {
-      textAlign: 'right',
-      writingDirection: 'rtl',
     },
     outputActions: {
       flexDirection: 'row',
@@ -296,6 +302,45 @@ export const createStyles = (theme: Theme) => {
     historyList: {
       gap: Spacing.sm,
     },
+    // 紧凑的历史记录项
+    historyItemCompact: {
+      backgroundColor: '#FFF8F0', // 马卡龙米色
+      borderRadius: BorderRadius.lg,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      borderWidth: 1,
+      borderColor: '#F0E6D8',
+    },
+    historyItemRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    historyItemSource: {
+      color: theme.textPrimary,
+      fontSize: 14,
+      flex: 1,
+    },
+    historyItemDivider: {
+      color: theme.textMuted,
+      fontSize: 12,
+    },
+    historyItemUrdu: {
+      color: '#7C5DC4', // 紫色加深
+      fontSize: 14,
+      fontWeight: '600',
+      flex: 1.2,
+      textAlign: 'right',
+    },
+    historyItemEnglish: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      flex: 1,
+    },
+    historyItemDelete: {
+      padding: Spacing.xs,
+      marginLeft: Spacing.sm,
+    },
     historyItem: {
       backgroundColor: theme.backgroundDefault,
       borderRadius: BorderRadius.md,
@@ -314,9 +359,6 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       gap: Spacing.xs,
     },
-    historyItemDelete: {
-      padding: Spacing.xs,
-    },
     historyItemText: {
       color: theme.textPrimary,
       marginBottom: Spacing.xs,
@@ -330,7 +372,7 @@ export const createStyles = (theme: Theme) => {
     },
     emptyHistory: {
       alignItems: 'center',
-      paddingVertical: Spacing['3xl'],
+      paddingVertical: Spacing['2xl'],
     },
     emptyHistoryText: {
       color: theme.textMuted,

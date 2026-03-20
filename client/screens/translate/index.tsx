@@ -245,8 +245,8 @@ export default function TranslateScreen() {
             >
               <FontAwesome6
                 name={languageIcons[lang]}
-                size={14}
-                color={sourceLang === lang ? theme.primary : theme.textMuted}
+                size={12}
+                color={sourceLang === lang ? '#7C5DC4' : theme.textMuted}
               />
               <ThemedText
                 style={[
@@ -276,7 +276,7 @@ export default function TranslateScreen() {
               value={inputText}
               onChangeText={setInputText}
               multiline
-              numberOfLines={4}
+              numberOfLines={2}
             />
             <View style={styles.inputActions}>
               {inputText.length > 0 && (
@@ -389,7 +389,7 @@ export default function TranslateScreen() {
           </View>
         )}
 
-        {/* History Section */}
+        {/* History Section - 最近3条 */}
         {history.length > 0 && (
           <View style={styles.historySection}>
             <View style={styles.historyHeader}>
@@ -402,48 +402,40 @@ export default function TranslateScreen() {
             </View>
 
             <View style={styles.historyList}>
-              {history.map((item) => (
+              {history.slice(0, 3).map((item) => (
                 <TouchableOpacity
                   key={item.id}
-                  style={styles.historyItem}
+                  style={styles.historyItemCompact}
                   onPress={() => handleUseHistory(item)}
                 >
-                  <View style={styles.historyItemHeader}>
-                    <View style={styles.historyItemLang}>
-                      <ThemedText variant="caption" color={theme.textMuted}>
-                        {languageNames[item.sourceLang]}
-                      </ThemedText>
-                      <FontAwesome6 name="arrow-right" size={10} color={theme.textMuted} />
-                      <ThemedText variant="caption" color={theme.primary}>
-                        اردو
-                      </ThemedText>
-                    </View>
+                  <View style={styles.historyItemRow}>
+                    <ThemedText
+                      style={styles.historyItemSource}
+                      numberOfLines={1}
+                    >
+                      {item.sourceText}
+                    </ThemedText>
+                    <ThemedText style={styles.historyItemDivider}>—</ThemedText>
+                    <ThemedText
+                      style={styles.historyItemUrdu}
+                      numberOfLines={1}
+                    >
+                      {item.urduText}
+                    </ThemedText>
+                    <ThemedText style={styles.historyItemDivider}>—</ThemedText>
+                    <ThemedText
+                      style={styles.historyItemEnglish}
+                      numberOfLines={1}
+                    >
+                      {item.englishText}
+                    </ThemedText>
                     <TouchableOpacity
                       style={styles.historyItemDelete}
                       onPress={() => handleDeleteHistoryItem(item.id)}
                     >
-                      <FontAwesome6 name="trash" size={14} color={theme.textMuted} />
+                      <FontAwesome6 name="xmark" size={12} color={theme.textMuted} />
                     </TouchableOpacity>
                   </View>
-                  <ThemedText
-                    variant="small"
-                    color={theme.textPrimary}
-                    style={styles.historyItemText}
-                    numberOfLines={1}
-                  >
-                    {item.sourceText}
-                  </ThemedText>
-                  <ThemedText
-                    variant="smallMedium"
-                    color={theme.primary}
-                    style={[
-                      styles.historyItemText,
-                      styles.historyItemTextRTL,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {item.urduText}
-                  </ThemedText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -453,7 +445,7 @@ export default function TranslateScreen() {
         {/* Empty History */}
         {history.length === 0 && (
           <View style={styles.emptyHistory}>
-            <FontAwesome6 name="clock-rotate-left" size={48} color={theme.textMuted} />
+            <FontAwesome6 name="clock-rotate-left" size={36} color={theme.textMuted} />
             <ThemedText variant="small" color={theme.textMuted} style={styles.emptyHistoryText}>
               暂无历史记录
             </ThemedText>
