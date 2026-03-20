@@ -15,11 +15,13 @@ export const createStyles = (theme: Theme) => {
     },
     header: {
       marginBottom: Spacing.lg,
+      marginTop: Spacing.md, // 顶部留出间距，避免遮挡状态栏
+      marginHorizontal: Spacing.sm, // 左右留出边距
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 深紫色背景
       paddingVertical: Spacing.lg,
-      marginHorizontal: -Spacing.lg, // 填充满整行
       paddingHorizontal: Spacing.lg,
+      borderRadius: BorderRadius.xl, // 圆角
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
