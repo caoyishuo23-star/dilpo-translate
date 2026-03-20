@@ -30,6 +30,14 @@ import {
 
 const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
 const HISTORY_STORAGE_KEY = 'translation_history';
+const LANGUAGE_SETTINGS_KEY = 'language_settings';
+
+// 语言设置类型
+interface LanguageSettings {
+  sourceLang: LanguageCode;
+  primaryLang: LanguageCode;
+  secondaryLang: LanguageCode;
+}
 
 // 历史记录类型
 interface HistoryItem {
@@ -47,10 +55,11 @@ export default function TranslateScreen() {
   const { theme, isDark } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
-  // 语言状态 - 三种语言
+  // 语言状态 - 三种语言（默认值，会被持久化数据覆盖）
   const [sourceLang, setSourceLang] = useState<LanguageCode>('auto'); // 第一语言（支持自动检测）
   const [primaryLang, setPrimaryLang] = useState<LanguageCode>('ur'); // 第二语言（默认乌尔都语）
   const [secondaryLang, setSecondaryLang] = useState<LanguageCode>('en'); // 第三语言（默认英文）
+  const [settingsLoaded, setSettingsLoaded] = useState(false); // 标记设置是否已加载
   
   const [inputText, setInputText] = useState('');
   const [primaryText, setPrimaryText] = useState('');
@@ -72,11 +81,50 @@ export default function TranslateScreen() {
   const recordingRef = useRef<Audio.Recording | null>(null);
   const soundRef = useRef<Audio.Sound | null>(null);
 
-  // 加载历史记录
+  // 加载历史记录和语言设置
   useEffect(() => {
     loadHistory();
+    loadLanguageSettings();
     requestAudioPermission();
   }, []);
+
+  // 保存语言设置（当语言变化时）
+  useEffect(() => {
+    if (settingsLoaded) {
+      saveLanguageSettings();
+    }
+  }, [sourceLang, primaryLang, secondaryLang, settingsLoaded]);
+
+  // 加载语言设置
+  const loadLanguageSettings = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(LANGUAGE_SETTINGS_KEY);
+      if (stored) {
+        const settings: LanguageSettings = JSON.parse(stored);
+        setSourceLang(settings.sourceLang);
+        setPrimaryLang(settings.primaryLang);
+        setSecondaryLang(settings.secondaryLang);
+      }
+      setSettingsLoaded(true);
+    } catch (e) {
+      console.error('Failed to load language settings:', e);
+      setSettingsLoaded(true);
+    }
+  };
+
+  // 保存语言设置
+  const saveLanguageSettings = async () => {
+    try {
+      const settings: LanguageSettings = {
+        sourceLang,
+        primaryLang,
+        secondaryLang,
+      };
+      await AsyncStorage.setItem(LANGUAGE_SETTINGS_KEY, JSON.stringify(settings));
+    } catch (e) {
+      console.error('Failed to save language settings:', e);
+    }
+  };
 
   // 请求录音权限
   const requestAudioPermission = async () => {
