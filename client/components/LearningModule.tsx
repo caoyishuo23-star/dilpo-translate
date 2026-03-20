@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
 import { FontAwesome6 } from '@expo/vector-icons';
@@ -22,6 +21,12 @@ import {
   categoryNames,
 } from '@/constants/commonPhrases';
 
+interface RelatedSentence {
+  source: string;
+  target: string;
+  word: string;
+}
+
 interface IELTSSentence {
   sentence: string;
   type: string;
@@ -37,6 +42,8 @@ interface LearningModuleProps {
 export function LearningModule({ primaryLang, recentWords = [] }: LearningModuleProps) {
   const { theme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<PhraseCategory | null>(null);
+  const [relatedSentences, setRelatedSentences] = useState<RelatedSentence[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
   const [ieltSentences, setIeltSentences] = useState<IELTSSentence[]>([]);
   const [isLoadingIELTS, setIsLoadingIELTS] = useState(false);
   const [activeTab, setActiveTab] = useState<'phrases' | 'ielts'>('phrases');
@@ -44,13 +51,48 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
   const langInfo = getLanguageByCode(primaryLang);
   const phrases = getPhrasesForLanguage(primaryLang);
   const isEnglish = primaryLang === 'en';
+  const hasRecentWords = recentWords.length > 0;
+
+  // 获取相关句子
+  useEffect(() => {
+    if (hasRecentWords && primaryLang) {
+      fetchRelatedSentences();
+    }
+  }, [recentWords, primaryLang]);
 
   // 获取雅思句子
   useEffect(() => {
-    if (isEnglish && recentWords.length > 0 && activeTab === 'ielts') {
+    if (isEnglish && hasRecentWords && activeTab === 'ielts') {
       fetchIELTSSentences();
     }
   }, [recentWords, activeTab, isEnglish]);
+
+  const fetchRelatedSentences = async () => {
+    if (recentWords.length === 0) return;
+    
+    setIsLoadingRelated(true);
+    try {
+      const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/learning/related`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          words: recentWords.slice(0, 3),
+          targetLang: primaryLang,
+          count: 3,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.data?.sentences) {
+        setRelatedSentences(data.data.sentences);
+      }
+    } catch (e) {
+      console.error('Failed to fetch related sentences:', e);
+    } finally {
+      setIsLoadingRelated(false);
+    }
+  };
 
   const fetchIELTSSentences = async () => {
     if (recentWords.length === 0) return;
@@ -114,21 +156,130 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
     </View>
   );
 
-  // 渲染对话列表
-  const renderPhrases = () => {
+  // 渲染相关句子（基于最近搜索词）
+  const renderRelatedSentences = () => {
+    if (!hasRecentWords) {
+      return null;
+    }
+
+    if (isLoadingRelated) {
+      return (
+        <View style={{ alignItems: 'center', paddingVertical: Spacing.md }}>
+          <ActivityIndicator color="#8B7DB8" size="small" />
+        </View>
+      );
+    }
+
+    if (relatedSentences.length === 0) {
+      return null;
+    }
+
+    return (
+      <View style={{ marginBottom: Spacing.lg }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: Spacing.xs,
+            marginBottom: Spacing.sm,
+          }}
+        >
+          <FontAwesome6 name="lightbulb" size={12} color="#F59E0B" />
+          <ThemedText
+            style={{
+              fontSize: 13,
+              fontWeight: '600',
+              color: '#F59E0B',
+            }}
+          >
+            相关学习
+          </ThemedText>
+        </View>
+        {relatedSentences.map((item, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              paddingVertical: Spacing.sm,
+              borderBottomWidth: 1,
+              borderBottomColor: '#F0F0F0',
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <ThemedText
+                style={{
+                  fontSize: 14,
+                  color: '#1A1A2E',
+                  marginBottom: 2,
+                }}
+              >
+                {item.source}
+              </ThemedText>
+              <ThemedText
+                style={{
+                  fontSize: 15,
+                  fontWeight: '600',
+                  color: '#6B5B95',
+                  textAlign: langInfo.isRTL ? 'right' : 'left',
+                }}
+              >
+                {item.target}
+              </ThemedText>
+            </View>
+            <View
+              style={{
+                backgroundColor: '#FEF3C7',
+                paddingVertical: 2,
+                paddingHorizontal: Spacing.sm,
+                borderRadius: BorderRadius.sm,
+              }}
+            >
+              <ThemedText style={{ fontSize: 10, color: '#F59E0B' }}>
+                {item.word}
+              </ThemedText>
+            </View>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  // 渲染日常对话列表
+  const renderDailyPhrases = () => {
     const displayPhrases: CategoryPhrases[] = selectedCategory
       ? phrases.filter((p) => p.category === selectedCategory)
-      : phrases.slice(0, 2); // 默认显示前两个场景
+      : phrases.slice(0, 2);
 
     return (
       <View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: Spacing.xs,
+            marginBottom: Spacing.sm,
+          }}
+        >
+          <FontAwesome6 name="comments" size={12} color="#8B7DB8" />
+          <ThemedText
+            style={{
+              fontSize: 13,
+              fontWeight: '600',
+              color: '#6B5B95',
+            }}
+          >
+            日常对话
+          </ThemedText>
+        </View>
+        {renderCategorySelector()}
         {displayPhrases.map((cat) => (
           <View key={cat.category} style={{ marginBottom: Spacing.md }}>
             <ThemedText
               style={{
-                fontSize: 13,
-                fontWeight: '600',
-                color: '#6B5B95',
+                fontSize: 12,
+                fontWeight: '500',
+                color: '#999999',
                 marginBottom: Spacing.sm,
               }}
             >
@@ -188,7 +339,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
 
   // 渲染雅思句子
   const renderIELTS = () => {
-    if (recentWords.length === 0) {
+    if (!hasRecentWords) {
       return (
         <View
           style={{
@@ -323,14 +474,14 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.sm }}>
-          <FontAwesome6 name="graduation-cap" size={18} color="#8B7DB8" />
+          <FontAwesome6 name="battery-full" size={18} color="#8B7DB8" />
           <ThemedText style={{ fontSize: 16, fontWeight: '600', color: '#1A1A2E' }}>
-            {isEnglish ? '雅思学习' : `${langInfo.nativeName}学习`}
+            充电小站
           </ThemedText>
         </View>
       </View>
 
-      {/* 英文时显示Tab切换 */}
+      {/* 只有英文时显示Tab切换 */}
       {isEnglish && (
         <View
           style={{
@@ -395,8 +546,8 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
       >
         {activeTab === 'phrases' ? (
           <>
-            {renderCategorySelector()}
-            {renderPhrases()}
+            {renderRelatedSentences()}
+            {renderDailyPhrases()}
           </>
         ) : (
           renderIELTS()
