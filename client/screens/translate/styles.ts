@@ -16,23 +16,25 @@ export const createStyles = (theme: Theme) => {
     header: {
       marginBottom: Spacing.lg,
       alignItems: 'center',
+      backgroundColor: '#8B7DB8', // 深紫色背景
+      paddingVertical: Spacing.lg,
+      marginHorizontal: -Spacing.lg, // 填充满整行
+      paddingHorizontal: Spacing.lg,
     },
     headerTitleContainer: {
-      backgroundColor: '#8B7DB8', // 比翻译按钮(#C4B5E8)更深一点的紫色
-      paddingVertical: Spacing.sm + 4,
-      paddingHorizontal: Spacing.xl + 4,
-      borderRadius: BorderRadius.lg,
-      marginBottom: Spacing.xs,
+      backgroundColor: 'transparent', // 透明，使用header的背景
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.md,
     },
     headerTitle: {
       textAlign: 'center',
       color: '#FFFFFF', // 白色文字
       fontWeight: '700',
-      letterSpacing: 1,
+      letterSpacing: 2,
     },
     headerSubtitle: {
       textAlign: 'center',
-      color: '#666666',
+      color: 'rgba(255,255,255,0.85)', // 半透明白色
     },
     // 语言选择器 - 左右箭头形式
     languageSelector: {
@@ -164,14 +166,14 @@ export const createStyles = (theme: Theme) => {
     },
     // 翻译按钮
     translateButton: {
-      backgroundColor: '#C4B5E8', // 淡紫色
+      backgroundColor: '#8B7DB8', // 深紫色，与标题一致
       paddingVertical: Spacing.md,
       borderRadius: BorderRadius.lg,
       alignItems: 'center',
       marginBottom: Spacing.lg,
-      shadowColor: '#C4B5E8',
+      shadowColor: '#8B7DB8',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
+      shadowOpacity: 0.3,
       shadowRadius: 6,
       elevation: 2,
     },
