@@ -42,8 +42,8 @@ interface LearningModuleProps {
   recentWords?: string[];
 }
 
-// 默认显示的最大高度（约20行）
-const DEFAULT_MAX_HEIGHT = 320;
+// 默认显示的最大高度（约40行）
+const DEFAULT_MAX_HEIGHT = 640;
 
 export function LearningModule({ primaryLang, recentWords = [] }: LearningModuleProps) {
   const { theme } = useTheme();
