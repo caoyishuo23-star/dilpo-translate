@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     "name": "Dilpo",
-    "slug": "dilpo",
+    "slug": "app7619187381748465670",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -77,7 +77,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     "extra": {
       "eas": {
         "projectId": "4410de29-fee8-470f-a545-54866344b4f4"
-      }
+      },
+      "EXPO_PUBLIC_BACKEND_BASE_URL": "https://diplo-translate-server-production.up.railway.app"
     }
   }
 }
