@@ -303,13 +303,13 @@ export const createStyles = (theme: Theme) => {
     },
     // 历史记录
     historySection: {
-      marginTop: Spacing.xl,
+      marginTop: Spacing.lg,
     },
     historyHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: Spacing.md,
+      marginBottom: Spacing.sm,
     },
     historyTitle: {
       color: '#1A1A2E',
@@ -322,45 +322,57 @@ export const createStyles = (theme: Theme) => {
       color: '#E57373',
     },
     historyList: {
-      gap: Spacing.sm,
+      gap: Spacing.xs,
     },
     historyItemCompact: {
-      backgroundColor: '#FFFDF8', // 米白色背景
-      borderRadius: BorderRadius.lg,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
+      backgroundColor: '#FFFDF8',
+      borderRadius: BorderRadius.md,
+      paddingVertical: Spacing.xs + 2,
+      paddingHorizontal: Spacing.md,
       borderWidth: 1,
       borderColor: '#F0E8D8',
     },
     historyItemRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: Spacing.sm,
+      gap: Spacing.xs,
     },
     historyItemSource: {
-      color: '#1A1A2E', // 清晰的深色
-      fontSize: 14,
+      color: '#1A1A2E',
+      fontSize: 12,
       flex: 1,
     },
     historyItemDivider: {
       color: '#999999',
-      fontSize: 12,
+      fontSize: 10,
     },
     historyItemUrdu: {
-      color: '#6B5B95', // 紫色加深
-      fontSize: 14,
+      color: '#6B5B95',
+      fontSize: 12,
       fontWeight: '600',
       flex: 1.2,
       textAlign: 'right',
     },
     historyItemEnglish: {
       color: '#555555',
-      fontSize: 13,
+      fontSize: 11,
       flex: 1,
     },
     historyItemDelete: {
-      padding: Spacing.xs,
-      marginLeft: Spacing.sm,
+      padding: 2,
+      marginLeft: Spacing.xs,
+    },
+    historyExpandButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.xs,
+      paddingVertical: Spacing.xs,
+      marginTop: Spacing.xs,
+    },
+    historyExpandText: {
+      fontSize: 12,
+      color: '#8B7DB8',
     },
     historyItem: {
       backgroundColor: '#FFFFFF',

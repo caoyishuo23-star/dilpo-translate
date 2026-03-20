@@ -59,6 +59,7 @@ export default function TranslateScreen() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
 
   // 语音相关状态
   const [isRecording, setIsRecording] = useState(false);
@@ -604,7 +605,7 @@ export default function TranslateScreen() {
             </View>
 
             <View style={styles.historyList}>
-              {history.slice(0, 3).map((item) => (
+              {(isHistoryExpanded ? history.slice(0, 50) : history.slice(0, 2)).map((item) => (
                 <TouchableOpacity
                   key={item.id}
                   style={styles.historyItemCompact}
@@ -635,22 +636,28 @@ export default function TranslateScreen() {
                       style={styles.historyItemDelete}
                       onPress={() => handleDeleteHistoryItem(item.id)}
                     >
-                      <FontAwesome6 name="xmark" size={12} color="#999999" />
+                      <FontAwesome6 name="xmark" size={10} color="#999999" />
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               ))}
+              {/* 展开更多 */}
+              {history.length > 2 && (
+                <TouchableOpacity
+                  style={styles.historyExpandButton}
+                  onPress={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                >
+                  <ThemedText style={styles.historyExpandText}>
+                    {isHistoryExpanded ? '收起' : `...展开全部 (${history.length}条)`}
+                  </ThemedText>
+                  <FontAwesome6 
+                    name={isHistoryExpanded ? 'chevron-up' : 'chevron-down'} 
+                    size={10} 
+                    color="#8B7DB8" 
+                  />
+                </TouchableOpacity>
+              )}
             </View>
-          </View>
-        )}
-
-        {/* Empty History */}
-        {history.length === 0 && (
-          <View style={styles.emptyHistory}>
-            <FontAwesome6 name="clock-rotate-left" size={36} color="#CCCCCC" />
-            <ThemedText variant="small" style={styles.emptyHistoryText}>
-              暂无历史记录
-            </ThemedText>
           </View>
         )}
 
