@@ -9,19 +9,16 @@ export const createStyles = (theme: Theme) => {
     },
     scrollContent: {
       flexGrow: 1,
-      backgroundColor: '#FAFAFA', // 内容区域浅色背景
       paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing.lg,
+      paddingTop: 0, // Header 会处理顶部间距
       paddingBottom: Spacing['4xl'],
-      borderTopLeftRadius: BorderRadius.xl, // 顶部圆角
-      borderTopRightRadius: BorderRadius.xl, // 顶部圆角
     },
     header: {
-      marginBottom: 0, // 无底部间距，让内容区域向上贴近
+      marginBottom: Spacing.lg,
       marginTop: 0, // 从顶部开始
-      marginHorizontal: 0, // 左右填满
+      marginHorizontal: -Spacing.lg, // 左右填满屏幕
       alignItems: 'center',
-      backgroundColor: '#6B5B95', // 深紫色背景
+      backgroundColor: '#8B7DB8', // 淡紫色背景
       paddingTop: Spacing['2xl'], // 给状态栏留出空间
       paddingBottom: Spacing.lg,
       paddingHorizontal: Spacing.lg,
@@ -58,10 +55,10 @@ export const createStyles = (theme: Theme) => {
       width: 40,
       height: 40,
       borderRadius: BorderRadius.full,
-      backgroundColor: '#6B5B95',
+      backgroundColor: '#8B7DB8',
       alignItems: 'center',
       justifyContent: 'center',
-      shadowColor: '#6B5B95',
+      shadowColor: '#8B7DB8',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
