@@ -23,12 +23,11 @@ export const createStyles = (theme: Theme) => {
     headerSubtitle: {
       textAlign: 'center',
     },
+    // 语言选择器
     languageSelector: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
       marginBottom: Spacing.xl,
-      gap: Spacing.md,
+      gap: Spacing.sm,
     },
     languageButton: {
       flex: 1,
@@ -36,7 +35,7 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: theme.backgroundDefault,
-      paddingVertical: Spacing.lg,
+      paddingVertical: Spacing.md,
       paddingHorizontal: Spacing.lg,
       borderRadius: BorderRadius.lg,
       borderWidth: 1,
@@ -45,7 +44,7 @@ export const createStyles = (theme: Theme) => {
     },
     languageButtonActive: {
       borderColor: theme.primary,
-      backgroundColor: theme.backgroundTertiary,
+      backgroundColor: theme.primary + '15',
     },
     languageButtonText: {
       color: theme.textPrimary,
@@ -54,14 +53,7 @@ export const createStyles = (theme: Theme) => {
       color: theme.primary,
       fontWeight: '600',
     },
-    swapButton: {
-      width: 44,
-      height: 44,
-      borderRadius: BorderRadius.full,
-      backgroundColor: theme.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
+    // 输入区域
     inputSection: {
       marginBottom: Spacing.lg,
     },
@@ -97,12 +89,13 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.sm,
       backgroundColor: theme.backgroundTertiary,
     },
+    // 翻译按钮
     translateButton: {
       backgroundColor: theme.primary,
       paddingVertical: Spacing.lg,
       borderRadius: BorderRadius.lg,
       alignItems: 'center',
-      marginBottom: Spacing.lg,
+      marginBottom: Spacing.xl,
     },
     translateButtonDisabled: {
       opacity: 0.6,
@@ -112,15 +105,38 @@ export const createStyles = (theme: Theme) => {
       fontWeight: '600',
       fontSize: 16,
     },
+    // 结果区域
+    resultsContainer: {
+      gap: Spacing.lg,
+    },
     outputSection: {
-      marginBottom: Spacing.lg,
+      marginBottom: Spacing.sm,
+    },
+    outputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: Spacing.sm,
+    },
+    outputLabel: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    outputLabelIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: BorderRadius.md,
+      backgroundColor: theme.primary + '15',
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     outputContainer: {
       backgroundColor: theme.backgroundDefault,
       borderRadius: BorderRadius.lg,
       borderWidth: 1,
       borderColor: theme.border,
-      minHeight: 120,
+      minHeight: 100,
       padding: Spacing.lg,
     },
     outputText: {
@@ -138,8 +154,9 @@ export const createStyles = (theme: Theme) => {
       padding: Spacing.sm,
       gap: Spacing.xs,
     },
+    // 历史记录
     historySection: {
-      marginTop: Spacing.lg,
+      marginTop: Spacing.xl,
     },
     historyHeader: {
       flexDirection: 'row',

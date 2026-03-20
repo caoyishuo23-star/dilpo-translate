@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScrollView,
   TextInput,
@@ -29,13 +29,21 @@ const languageNames: Record<Language, string> = {
   ur: 'اردو',
 };
 
+// 语言图标
+const languageIcons: Record<Language, string> = {
+  zh: 'language',
+  en: 'font',
+  ur: 'language',
+};
+
 // 历史记录类型
 interface HistoryItem {
   id: string;
   sourceText: string;
-  translatedText: string;
+  englishText: string;
+  urduText: string;
+  chineseText?: string;
   sourceLang: Language;
-  targetLang: Language;
   timestamp: number;
 }
 
@@ -45,9 +53,10 @@ export default function TranslateScreen() {
 
   // 状态
   const [sourceLang, setSourceLang] = useState<Language>('zh');
-  const [targetLang, setTargetLang] = useState<Language>('ur');
   const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [englishText, setEnglishText] = useState('');
+  const [urduText, setUrduText] = useState('');
+  const [chineseText, setChineseText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -76,14 +85,6 @@ export default function TranslateScreen() {
     }
   };
 
-  // 交换语言
-  const handleSwapLanguages = () => {
-    setSourceLang(targetLang);
-    setTargetLang(sourceLang);
-    setInputText(outputText);
-    setOutputText(inputText);
-  };
-
   // 翻译
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -98,7 +99,8 @@ export default function TranslateScreen() {
       /**
        * 服务端文件：server/src/routes/translate.ts
        * 接口：POST /api/v1/translate
-       * Body 参数：text: string, sourceLang: string, targetLang: string
+       * Body 参数：text: string, sourceLang: string
+       * 返回：englishText, urduText, chineseText (根据源语言)
        */
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/translate`, {
         method: 'POST',
@@ -106,25 +108,27 @@ export default function TranslateScreen() {
         body: JSON.stringify({
           text: inputText.trim(),
           sourceLang,
-          targetLang,
         }),
       });
 
       const data = await response.json();
 
       if (data.success && data.data) {
-        setOutputText(data.data.translatedText);
+        setEnglishText(data.data.englishText || '');
+        setUrduText(data.data.urduText || '');
+        setChineseText(data.data.chineseText || '');
         
         // 添加到历史记录
         const newItem: HistoryItem = {
           id: Date.now().toString(),
           sourceText: inputText.trim(),
-          translatedText: data.data.translatedText,
+          englishText: data.data.englishText || '',
+          urduText: data.data.urduText || '',
+          chineseText: data.data.chineseText || '',
           sourceLang,
-          targetLang,
           timestamp: Date.now(),
         };
-        const newHistory = [newItem, ...history].slice(0, 20); // 保留最近20条
+        const newHistory = [newItem, ...history].slice(0, 20);
         setHistory(newHistory);
         await saveHistory(newHistory);
       } else {
@@ -151,7 +155,9 @@ export default function TranslateScreen() {
   // 清空输入
   const handleClear = () => {
     setInputText('');
-    setOutputText('');
+    setEnglishText('');
+    setUrduText('');
+    setChineseText('');
     setError(null);
   };
 
@@ -180,55 +186,38 @@ export default function TranslateScreen() {
   // 使用历史记录
   const handleUseHistory = (item: HistoryItem) => {
     setSourceLang(item.sourceLang);
-    setTargetLang(item.targetLang);
     setInputText(item.sourceText);
-    setOutputText(item.translatedText);
+    setEnglishText(item.englishText);
+    setUrduText(item.urduText);
+    setChineseText(item.chineseText || '');
     setError(null);
   };
 
   // 判断是否是RTL语言
   const isRTLLanguage = (lang: Language) => lang === 'ur';
 
-  // 语言选择器组件
-  const LanguageSelector = useCallback(
-    ({ value, onChange, exclude }: { value: Language; onChange: (lang: Language) => void; exclude: Language }) => {
-      const languages: Language[] = (['zh', 'en', 'ur'] as Language[]).filter((l) => l !== exclude);
-      
-      return (
-        <View style={styles.languageButton}>
-          {languages.map((lang) => (
-            <TouchableOpacity
-              key={lang}
-              style={[
-                styles.languageButton,
-                value === lang && styles.languageButtonActive,
-                { flex: 1, marginBottom: lang !== languages[languages.length - 1] ? Spacing.xs : 0 }
-              ]}
-              onPress={() => onChange(lang)}
-            >
-              <ThemedText
-                style={[
-                  styles.languageButtonText,
-                  value === lang && styles.languageButtonTextActive,
-                ]}
-              >
-                {languageNames[lang]}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </View>
-      );
-    },
-    [styles]
-  );
+  // 根据源语言决定显示哪些翻译结果
+  const getOutputConfigs = () => {
+    if (sourceLang === 'zh') {
+      return [
+        { key: 'en', label: 'English', text: englishText, isRTL: false },
+        { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
+      ];
+    } else if (sourceLang === 'en') {
+      return [
+        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
+        { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
+      ];
+    } else {
+      return [
+        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
+        { key: 'en', label: 'English', text: englishText, isRTL: false },
+      ];
+    }
+  };
 
-  const Spacing = useMemo(() => ({
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 20,
-  }), []);
+  const outputConfigs = getOutputConfigs();
+  const hasOutput = englishText || urduText || chineseText;
 
   return (
     <Screen backgroundColor={theme.backgroundRoot} statusBarStyle={isDark ? 'light' : 'dark'}>
@@ -239,52 +228,36 @@ export default function TranslateScreen() {
             乌尔都语翻译
           </ThemedText>
           <ThemedText variant="small" color={theme.textSecondary} style={styles.headerSubtitle}>
-            中文 · 英语 · 乌尔都语 互译
+            输入文本，获取英文和乌尔都语翻译
           </ThemedText>
         </ThemedView>
 
-        {/* Language Selector */}
+        {/* Language Selector - 源语言选择 */}
         <View style={styles.languageSelector}>
-          {/* Source Language */}
-          <View style={{ flex: 1 }}>
+          {(['zh', 'en', 'ur'] as Language[]).map((lang) => (
             <TouchableOpacity
-              style={[styles.languageButton, styles.languageButtonActive]}
-              onPress={() => {
-                const availableLanguages: Language[] = (['zh', 'en', 'ur'] as Language[]).filter(l => l !== targetLang);
-                const currentIndex = availableLanguages.indexOf(sourceLang);
-                const nextIndex = (currentIndex + 1) % availableLanguages.length;
-                setSourceLang(availableLanguages[nextIndex]);
-              }}
+              key={lang}
+              style={[
+                styles.languageButton,
+                sourceLang === lang && styles.languageButtonActive,
+              ]}
+              onPress={() => setSourceLang(lang)}
             >
-              <ThemedText style={[styles.languageButtonText, styles.languageButtonTextActive]}>
-                {languageNames[sourceLang]}
+              <FontAwesome6
+                name={languageIcons[lang]}
+                size={14}
+                color={sourceLang === lang ? theme.primary : theme.textMuted}
+              />
+              <ThemedText
+                style={[
+                  styles.languageButtonText,
+                  sourceLang === lang && styles.languageButtonTextActive,
+                ]}
+              >
+                {languageNames[lang]}
               </ThemedText>
-              <FontAwesome6 name="chevron-down" size={12} color={theme.primary} />
             </TouchableOpacity>
-          </View>
-
-          {/* Swap Button */}
-          <TouchableOpacity style={styles.swapButton} onPress={handleSwapLanguages}>
-            <FontAwesome6 name="arrow-right-arrow-left" size={16} color={theme.buttonPrimaryText} />
-          </TouchableOpacity>
-
-          {/* Target Language */}
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={[styles.languageButton, styles.languageButtonActive]}
-              onPress={() => {
-                const availableLanguages: Language[] = (['zh', 'en', 'ur'] as Language[]).filter(l => l !== sourceLang);
-                const currentIndex = availableLanguages.indexOf(targetLang);
-                const nextIndex = (currentIndex + 1) % availableLanguages.length;
-                setTargetLang(availableLanguages[nextIndex]);
-              }}
-            >
-              <ThemedText style={[styles.languageButtonText, styles.languageButtonTextActive]}>
-                {languageNames[targetLang]}
-              </ThemedText>
-              <FontAwesome6 name="chevron-down" size={12} color={theme.primary} />
-            </TouchableOpacity>
-          </View>
+          ))}
         </View>
 
         {/* Input Section */}
@@ -341,32 +314,47 @@ export default function TranslateScreen() {
           </View>
         )}
 
-        {/* Output Section */}
-        {outputText ? (
-          <View style={styles.outputSection}>
-            <ThemedText variant="smallMedium" color={theme.textSecondary} style={styles.inputLabel}>
-              翻译结果 ({languageNames[targetLang]})
-            </ThemedText>
-            <ThemedView level="default" style={styles.outputContainer}>
-              <ThemedText
-                style={[
-                  styles.outputText,
-                  isRTLLanguage(targetLang) && styles.outputTextRTL,
-                ]}
-              >
-                {outputText}
-              </ThemedText>
-              <View style={styles.outputActions}>
-                <TouchableOpacity
-                  style={styles.inputActionButton}
-                  onPress={() => handleCopy(outputText)}
-                >
-                  <FontAwesome6 name="copy" size={16} color={theme.textMuted} />
-                </TouchableOpacity>
+        {/* Output Sections - 始终显示两个翻译结果 */}
+        {hasOutput && (
+          <View style={styles.resultsContainer}>
+            {outputConfigs.map((config) => (
+              <View key={config.key} style={styles.outputSection}>
+                <View style={styles.outputHeader}>
+                  <View style={styles.outputLabel}>
+                    <View style={styles.outputLabelIcon}>
+                      <FontAwesome6
+                        name={config.key === 'ur' ? 'language' : config.key === 'en' ? 'font' : 'language'}
+                        size={14}
+                        color={theme.primary}
+                      />
+                    </View>
+                    <ThemedText variant="smallMedium" color={theme.textPrimary}>
+                      {config.label}
+                    </ThemedText>
+                  </View>
+                </View>
+                <ThemedView level="default" style={styles.outputContainer}>
+                  <ThemedText
+                    style={[
+                      styles.outputText,
+                      config.isRTL && styles.outputTextRTL,
+                    ]}
+                  >
+                    {config.text || ' '}
+                  </ThemedText>
+                  <View style={styles.outputActions}>
+                    <TouchableOpacity
+                      style={styles.inputActionButton}
+                      onPress={() => handleCopy(config.text)}
+                    >
+                      <FontAwesome6 name="copy" size={16} color={theme.textMuted} />
+                    </TouchableOpacity>
+                  </View>
+                </ThemedView>
               </View>
-            </ThemedView>
+            ))}
           </View>
-        ) : null}
+        )}
 
         {/* History Section */}
         {history.length > 0 && (
@@ -394,7 +382,7 @@ export default function TranslateScreen() {
                       </ThemedText>
                       <FontAwesome6 name="arrow-right" size={10} color={theme.textMuted} />
                       <ThemedText variant="caption" color={theme.textMuted}>
-                        {languageNames[item.targetLang]}
+                        EN + UR
                       </ThemedText>
                     </View>
                     <TouchableOpacity
@@ -415,13 +403,21 @@ export default function TranslateScreen() {
                   <ThemedText
                     variant="small"
                     color={theme.textSecondary}
+                    style={styles.historyItemText}
+                    numberOfLines={1}
+                  >
+                    EN: {item.englishText}
+                  </ThemedText>
+                  <ThemedText
+                    variant="small"
+                    color={theme.textSecondary}
                     style={[
                       styles.historyItemText,
-                      isRTLLanguage(item.targetLang) && styles.historyItemTextRTL,
+                      styles.historyItemTextRTL,
                     ]}
                     numberOfLines={1}
                   >
-                    {item.translatedText}
+                    UR: {item.urduText}
                   </ThemedText>
                 </TouchableOpacity>
               ))}
