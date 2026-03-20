@@ -13,16 +13,19 @@ export const createStyles = (theme: Theme) => {
       paddingHorizontal: Spacing.lg,
       paddingTop: Spacing.lg,
       paddingBottom: Spacing['4xl'],
+      borderTopLeftRadius: BorderRadius.xl, // 顶部圆角
+      borderTopRightRadius: BorderRadius.xl, // 顶部圆角
+      marginTop: -Spacing.lg, // 向上覆盖，让圆角生效
     },
     header: {
-      marginBottom: Spacing.lg,
-      marginTop: Spacing.md, // 顶部间距
-      marginHorizontal: Spacing.sm, // 左右留出边距
+      marginBottom: 0, // 无底部间距
+      marginTop: 0, // 从顶部开始
+      marginHorizontal: 0, // 左右填满屏幕
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 淡紫色背景
-      paddingVertical: Spacing.lg,
+      paddingTop: Spacing['2xl'], // 给状态栏留出空间
+      paddingBottom: Spacing.lg,
       paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.xl, // 圆角
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
