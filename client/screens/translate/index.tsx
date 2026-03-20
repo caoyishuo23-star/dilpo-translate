@@ -13,6 +13,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Constants from 'expo-constants';
 import { createFormDataFile } from '@/utils';
 import { Screen } from '@/components/Screen';
 import { ThemedText } from '@/components/ThemedText';
@@ -28,7 +29,11 @@ import {
   getLanguageByCode,
 } from '@/constants/languages';
 
-const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+// 从环境变量或 extra 配置获取后端地址
+const EXPO_PUBLIC_BACKEND_BASE_URL = 
+  process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 
+  (Constants.expoConfig as any)?.extra?.EXPO_PUBLIC_BACKEND_BASE_URL || 
+  'https://diplo-translate-server-production.up.railway.app';
 const HISTORY_STORAGE_KEY = 'translation_history';
 const LANGUAGE_SETTINGS_KEY = 'language_settings';
 
