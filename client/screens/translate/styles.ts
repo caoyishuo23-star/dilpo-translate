@@ -36,18 +36,40 @@ export const createStyles = (theme: Theme) => {
       textAlign: 'center',
       color: 'rgba(255,255,255,0.85)', // 半透明白色
     },
-    // 语言选择器 - 左右箭头形式
-    languageSelector: {
+    // 语言选择器 - 三语言形式
+    languageSelectorContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'space-between',
       marginBottom: Spacing.lg,
-      gap: Spacing.sm,
       backgroundColor: '#FFFFFF',
       borderRadius: BorderRadius.xl,
       padding: Spacing.sm,
       borderWidth: 1,
       borderColor: '#E8E8E8',
+    },
+    langSelectorItem: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    arrowContainer: {
+      paddingHorizontal: Spacing.xs,
+    },
+    // 检测语言提示
+    detectedLangInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.xs,
+      marginBottom: Spacing.md,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+      backgroundColor: '#F8F5FF',
+      borderRadius: BorderRadius.lg,
+    },
+    detectedLangText: {
+      color: '#6B5B95',
+      fontSize: 13,
     },
     langSelectButton: {
       flex: 1,
