@@ -165,25 +165,60 @@ export const createStyles = (theme: Theme) => {
     resultsContainer: {
       gap: Spacing.md,
     },
-    outputSection: {
+    // 主翻译结果（第二语言）
+    primaryOutputSection: {
+      backgroundColor: '#FAFAFA',
+      borderRadius: BorderRadius.xl,
+      padding: Spacing.lg,
+      borderWidth: 1,
+      borderColor: '#F0EBFF',
+    },
+    secondaryOutputSection: {
+      backgroundColor: '#FAFAFA',
+      borderRadius: BorderRadius.xl,
+      padding: Spacing.lg,
+      borderWidth: 1,
+      borderColor: '#E8F5E9',
+    },
+    outputHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: Spacing.sm,
     },
-    // 主翻译结果（乌尔都语）
-    primaryOutputSection: {
+    outputLangLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: '#6B5B95',
+    },
+    outputActions: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+    },
+    outputActionButton: {
+      padding: Spacing.xs + 2,
+      borderRadius: BorderRadius.md,
+      backgroundColor: '#F5F5F5',
+    },
+    outputText: {
+      fontSize: 18,
+      color: '#1A1A2E',
+      lineHeight: 28,
+      fontWeight: '500',
+    },
+    outputTextRTL: {
+      textAlign: 'right',
+      writingDirection: 'rtl',
+    },
+    // 旧样式保留（兼容）
+    outputSection: {
       marginBottom: Spacing.sm,
-      borderRadius: BorderRadius.xl,
-      overflow: 'hidden',
-      shadowColor: '#C4B5E8',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
-      elevation: 3,
     },
     primaryOutputHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: '#B8A9D8', // 淡紫色标题
+      backgroundColor: '#B8A9D8',
       paddingVertical: Spacing.sm + 2,
       paddingHorizontal: Spacing.lg,
     },
@@ -207,13 +242,13 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.sm,
     },
     primaryOutputContainer: {
-      backgroundColor: '#FAF8FF', // 更浅的紫色背景
+      backgroundColor: '#FAF8FF',
       padding: Spacing.lg,
       minHeight: 80,
     },
     primaryOutputText: {
       fontSize: 18,
-      color: '#1A1A2E', // 清晰的深色文字
+      color: '#1A1A2E',
       lineHeight: 28,
       fontWeight: '600',
     },
@@ -263,7 +298,7 @@ export const createStyles = (theme: Theme) => {
       justifyContent: 'center',
     },
     referenceOutputContainer: {
-      backgroundColor: '#F8FFF8', // 更浅的绿色背景
+      backgroundColor: '#F8FFF8',
       padding: Spacing.md,
     },
     referenceLabelText: {
@@ -278,15 +313,6 @@ export const createStyles = (theme: Theme) => {
       paddingHorizontal: Spacing.sm,
       borderRadius: BorderRadius.sm,
     },
-    outputText: {
-      fontSize: 14,
-      color: '#1A1A2E', // 清晰的深色文字
-      lineHeight: 22,
-    },
-    outputTextRTL: {
-      textAlign: 'right',
-      writingDirection: 'rtl',
-    },
     outputContainer: {
       backgroundColor: '#FFFFFF',
       borderRadius: BorderRadius.lg,
@@ -294,12 +320,6 @@ export const createStyles = (theme: Theme) => {
       borderColor: '#E8E8E8',
       minHeight: 100,
       padding: Spacing.lg,
-    },
-    outputActions: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      padding: Spacing.sm,
-      gap: Spacing.xs,
     },
     // 历史记录
     historySection: {

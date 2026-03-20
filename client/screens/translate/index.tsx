@@ -496,98 +496,72 @@ export default function TranslateScreen() {
           <View style={styles.resultsContainer}>
             {/* 主翻译结果 */}
             <View style={styles.primaryOutputSection}>
-              <View style={styles.primaryOutputHeader}>
-                <View style={styles.primaryOutputLabel}>
-                  <View style={styles.primaryOutputLabelIcon}>
-                    <FontAwesome6 name="language" size={12} color="#FFFFFF" />
-                  </View>
-                  <View style={styles.primaryOutputLangTag}>
-                    <ThemedText variant="captionMedium" color="#FFFFFF">
-                      {primaryLangInfo.nativeName}
-                    </ThemedText>
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 8 }}>
+              <View style={styles.outputHeader}>
+                <ThemedText style={styles.outputLangLabel}>
+                  {primaryLangInfo.nativeName}
+                </ThemedText>
+                <View style={styles.outputActions}>
                   <TouchableOpacity
-                    style={styles.primaryCopyButton}
+                    style={styles.outputActionButton}
                     onPress={() => playTTS(primaryText, primaryLang, true)}
                   >
                     <FontAwesome6 
                       name={isPlayingPrimary ? "stop" : "volume-high"} 
-                      size={12} 
-                      color="#FFFFFF" 
+                      size={14} 
+                      color="#6B5B95" 
                     />
-                    <ThemedText variant="caption" color="#FFFFFF">
-                      {isPlayingPrimary ? '停止' : '播放'}
-                    </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.primaryCopyButton}
+                    style={styles.outputActionButton}
                     onPress={() => handleCopy(primaryText)}
                   >
-                    <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
-                    <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
+                    <FontAwesome6 name="copy" size={14} color="#6B5B95" />
                   </TouchableOpacity>
                 </View>
               </View>
-              <View style={styles.primaryOutputContainer}>
-                <ThemedText
-                  style={[
-                    styles.primaryOutputText,
-                    primaryLangInfo.isRTL && styles.primaryOutputTextRTL,
-                  ]}
-                >
-                  {primaryText || ' '}
-                </ThemedText>
-              </View>
+              <ThemedText
+                style={[
+                  styles.outputText,
+                  primaryLangInfo.isRTL && styles.outputTextRTL,
+                ]}
+              >
+                {primaryText || ' '}
+              </ThemedText>
             </View>
 
             {/* 参考翻译 */}
-            <View style={styles.referenceOutputSection}>
-              <View style={styles.referenceOutputHeader}>
-                <View style={styles.referenceOutputLabel}>
-                  <View style={styles.referenceOutputLabelIcon}>
-                    <FontAwesome6 name="eye" size={12} color="#FFFFFF" />
-                  </View>
-                  <View style={styles.referenceTag}>
-                    <ThemedText variant="captionMedium" color="#FFFFFF">
-                      {secondaryLangInfo.nativeName}
-                    </ThemedText>
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', gap: 8 }}>
+            <View style={styles.secondaryOutputSection}>
+              <View style={styles.outputHeader}>
+                <ThemedText style={[styles.outputLangLabel, { color: '#059669' }]}>
+                  {secondaryLangInfo.nativeName}
+                </ThemedText>
+                <View style={styles.outputActions}>
                   <TouchableOpacity
-                    style={styles.primaryCopyButton}
+                    style={styles.outputActionButton}
                     onPress={() => playTTS(secondaryText, secondaryLang, false)}
                   >
                     <FontAwesome6 
                       name={isPlayingSecondary ? "stop" : "volume-high"} 
-                      size={12} 
-                      color="#FFFFFF" 
+                      size={14} 
+                      color="#059669" 
                     />
-                    <ThemedText variant="caption" color="#FFFFFF">
-                      {isPlayingSecondary ? '停止' : '播放'}
-                    </ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={styles.primaryCopyButton}
+                    style={styles.outputActionButton}
                     onPress={() => handleCopy(secondaryText)}
                   >
-                    <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
-                    <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
+                    <FontAwesome6 name="copy" size={14} color="#059669" />
                   </TouchableOpacity>
                 </View>
               </View>
-              <View style={styles.referenceOutputContainer}>
-                <ThemedText
-                  style={[
-                    styles.outputText,
-                    secondaryLangInfo.isRTL && styles.outputTextRTL,
-                  ]}
-                >
-                  {secondaryText || ' '}
-                </ThemedText>
-              </View>
+              <ThemedText
+                style={[
+                  styles.outputText,
+                  secondaryLangInfo.isRTL && styles.outputTextRTL,
+                ]}
+              >
+                {secondaryText || ' '}
+              </ThemedText>
             </View>
           </View>
         )}
