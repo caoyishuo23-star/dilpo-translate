@@ -596,9 +596,12 @@ export default function TranslateScreen() {
         {history.length > 0 && (
           <View style={styles.historySection}>
             <View style={styles.historyHeader}>
-              <ThemedText variant="title" style={styles.historyTitle}>
-                历史记录
-              </ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <FontAwesome6 name="clock-rotate-left" size={14} color="#6B5B95" />
+                <ThemedText variant="title" style={styles.historyTitle}>
+                  历史记录
+                </ThemedText>
+              </View>
               <TouchableOpacity style={styles.clearAllButton} onPress={handleClearHistory}>
                 <ThemedText variant="small" color="#E57373">清空</ThemedText>
               </TouchableOpacity>
