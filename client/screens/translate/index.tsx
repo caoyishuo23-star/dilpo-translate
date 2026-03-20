@@ -20,6 +20,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
 import { createStyles } from './styles';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { LearningModule } from '@/components/LearningModule';
 import {
   LanguageCode,
   LanguageInfo,
@@ -653,6 +654,12 @@ export default function TranslateScreen() {
             </ThemedText>
           </View>
         )}
+
+        {/* Learning Module */}
+        <LearningModule
+          primaryLang={primaryLang}
+          recentWords={history.slice(0, 5).map(item => item.sourceText)}
+        />
       </ScrollView>
     </Screen>
   );
