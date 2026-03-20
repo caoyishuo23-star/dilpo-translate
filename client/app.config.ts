@@ -67,6 +67,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           "microphonePermission": `乌尔都语翻译App需要访问麦克风以录制视频声音。`,
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "乌尔都语翻译App需要使用麦克风进行语音输入"
+        }
       ]
     ],
     "experiments": {

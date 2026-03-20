@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   ScrollView,
   TextInput,
@@ -6,10 +6,14 @@ import {
   ActivityIndicator,
   Alert,
   View,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome6 } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system/legacy';
+import { createFormDataFile } from '@/utils';
 import { Screen } from '@/components/Screen';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -61,10 +65,31 @@ export default function TranslateScreen() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
 
+  // 语音相关状态
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlayingPrimary, setIsPlayingPrimary] = useState(false);
+  const [isPlayingReference, setIsPlayingReference] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+
+  // 引用
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const soundRef = useRef<Audio.Sound | null>(null);
+
   // 加载历史记录
   useEffect(() => {
     loadHistory();
+    requestAudioPermission();
   }, []);
+
+  // 请求录音权限
+  const requestAudioPermission = async () => {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    } catch (e) {
+      console.error('Permission error:', e);
+    }
+  };
 
   const loadHistory = async () => {
     try {
@@ -82,6 +107,138 @@ export default function TranslateScreen() {
       await AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(items));
     } catch (e) {
       console.error('Failed to save history:', e);
+    }
+  };
+
+  // 开始录音
+  const startRecording = async () => {
+    if (!hasPermission) {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('需要权限', '请授予录音权限');
+        return;
+      }
+      setHasPermission(true);
+    }
+
+    if (recordingRef.current) {
+      await recordingRef.current.stopAndUnloadAsync();
+      recordingRef.current = null;
+    }
+
+    try {
+      await Audio.setAudioModeAsync({ 
+        allowsRecordingIOS: true, 
+        playsInSilentModeIOS: true 
+      });
+      const recording = new Audio.Recording();
+      await recording.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      await recording.startAsync();
+      recordingRef.current = recording;
+      setIsRecording(true);
+    } catch (error) {
+      console.error('录音失败:', error);
+      Alert.alert('错误', '录音启动失败');
+    }
+  };
+
+  // 停止录音并进行语音识别
+  const stopRecording = async () => {
+    if (!recordingRef.current) return;
+
+    try {
+      await recordingRef.current.stopAndUnloadAsync();
+      const uri = recordingRef.current.getURI();
+      recordingRef.current = null;
+      setIsRecording(false);
+
+      if (uri) {
+        await handleSpeechRecognition(uri);
+      }
+    } catch (error) {
+      console.error('停止录音失败:', error);
+      setIsRecording(false);
+    }
+  };
+
+  // 语音识别
+  const handleSpeechRecognition = async (audioUri: string) => {
+    try {
+      // 使用 createFormDataFile 创建跨平台兼容的文件对象
+      const audioFile = await createFormDataFile(audioUri, 'audio.m4a', 'audio/m4a');
+      const formData = new FormData();
+      formData.append('audio', audioFile as any);
+
+      /**
+       * 服务端文件：server/src/routes/audio.ts
+       * 接口：POST /api/v1/audio/asr
+       * Body: FormData with audio file
+       */
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/audio/asr`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data?.text) {
+        setInputText(data.data.text);
+      } else {
+        Alert.alert('提示', '语音识别失败，请重试');
+      }
+    } catch (e) {
+      console.error('ASR error:', e);
+      Alert.alert('错误', '语音识别服务暂时不可用');
+    }
+  };
+
+  // 播放语音
+  const playTTS = async (text: string, lang: string, isPrimary: boolean) => {
+    const playingState = isPrimary ? isPlayingPrimary : isPlayingReference;
+    const setPlayingState = isPrimary ? setIsPlayingPrimary : setIsPlayingReference;
+
+    if (playingState && soundRef.current) {
+      // 正在播放，停止
+      await soundRef.current.stopAsync();
+      await soundRef.current.unloadAsync();
+      soundRef.current = null;
+      setPlayingState(false);
+      return;
+    }
+
+    try {
+      /**
+       * 服务端文件：server/src/routes/audio.ts
+       * 接口：POST /api/v1/audio/tts
+       * Body 参数：text: string, lang: string
+       */
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/audio/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data?.audioUri) {
+        // 播放音频
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: data.data.audioUri },
+          { shouldPlay: true, isLooping: false },
+          (status) => {
+            if (status.isLoaded && status.didJustFinish) {
+              setPlayingState(false);
+            }
+          }
+        );
+        soundRef.current = sound;
+        setPlayingState(true);
+      } else {
+        Alert.alert('提示', '语音合成失败');
+      }
+    } catch (e) {
+      console.error('TTS error:', e);
+      Alert.alert('错误', '语音服务暂时不可用');
     }
   };
 
@@ -187,31 +344,21 @@ export default function TranslateScreen() {
     setError(null);
   };
 
-  // 获取主翻译结果（目标：乌尔都语或中文）
+  // 获取主翻译结果
   const getPrimaryTranslation = () => {
-    if (sourceLang === 'zh') {
-      // 中文输入 → 主翻译：乌尔都语
-      return { text: urduText, label: 'اردو', isRTL: true };
-    } else if (sourceLang === 'en') {
-      // 英文输入 → 主翻译：乌尔都语
-      return { text: urduText, label: 'اردو', isRTL: true };
+    if (sourceLang === 'zh' || sourceLang === 'en') {
+      return { text: urduText, label: 'اردو', isRTL: true, lang: 'ur' };
     } else {
-      // 乌尔都语输入 → 主翻译：中文
-      return { text: chineseText, label: '中文', isRTL: false };
+      return { text: chineseText, label: '中文', isRTL: false, lang: 'zh' };
     }
   };
 
-  // 获取参考翻译结果（用于对照检验）
+  // 获取参考翻译结果
   const getReferenceTranslation = () => {
     if (sourceLang === 'zh') {
-      // 中文输入 → 参考：英文
-      return { text: englishText, label: 'English 参考翻译', isRTL: false };
-    } else if (sourceLang === 'en') {
-      // 英文输入 → 参考：中文
-      return { text: chineseText, label: '中文 参考翻译', isRTL: false };
+      return { text: englishText, label: 'English 参考翻译', isRTL: false, lang: 'en' };
     } else {
-      // 乌尔都语输入 → 参考：英文
-      return { text: englishText, label: 'English 参考翻译', isRTL: false };
+      return { text: englishText, label: 'English 参考翻译', isRTL: false, lang: 'en' };
     }
   };
 
@@ -220,19 +367,19 @@ export default function TranslateScreen() {
   const hasOutput = englishText || urduText || chineseText;
 
   return (
-    <Screen backgroundColor={theme.backgroundRoot} statusBarStyle={isDark ? 'light' : 'dark'}>
+    <Screen backgroundColor="#FAFAFA" statusBarStyle={isDark ? 'light' : 'dark'}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <ThemedView level="root" style={styles.header}>
-          <ThemedText variant="h2" color={theme.textPrimary} style={styles.headerTitle}>
+          <ThemedText variant="h2" style={styles.headerTitle}>
             乌尔都语翻译
           </ThemedText>
-          <ThemedText variant="small" color={theme.textSecondary} style={styles.headerSubtitle}>
+          <ThemedText variant="small" style={styles.headerSubtitle}>
             输入文本，获取乌尔都语翻译
           </ThemedText>
         </ThemedView>
 
-        {/* Language Selector - 源语言选择 */}
+        {/* Language Selector */}
         <View style={styles.languageSelector}>
           {(['zh', 'en', 'ur'] as Language[]).map((lang) => (
             <TouchableOpacity
@@ -246,7 +393,7 @@ export default function TranslateScreen() {
               <FontAwesome6
                 name={languageIcons[lang]}
                 size={12}
-                color={sourceLang === lang ? '#7C5DC4' : theme.textMuted}
+                color={sourceLang === lang ? '#6B5B95' : '#999999'}
               />
               <ThemedText
                 style={[
@@ -262,7 +409,7 @@ export default function TranslateScreen() {
 
         {/* Input Section */}
         <View style={styles.inputSection}>
-          <ThemedText variant="smallMedium" color={theme.textSecondary} style={styles.inputLabel}>
+          <ThemedText variant="smallMedium" style={styles.inputLabel}>
             输入文本 ({languageNames[sourceLang]})
           </ThemedText>
           <ThemedView level="default" style={styles.inputContainer}>
@@ -272,16 +419,28 @@ export default function TranslateScreen() {
                 sourceLang === 'ur' && styles.inputRTL,
               ]}
               placeholder={`输入${languageNames[sourceLang]}文本...`}
-              placeholderTextColor={theme.textMuted}
+              placeholderTextColor="#AAAAAA"
               value={inputText}
               onChangeText={setInputText}
               multiline
               numberOfLines={2}
             />
             <View style={styles.inputActions}>
+              {/* 语音输入按钮 */}
+              <TouchableOpacity
+                style={[styles.voiceButton, isRecording && styles.voiceButtonActive]}
+                onPressIn={startRecording}
+                onPressOut={stopRecording}
+              >
+                <FontAwesome6 
+                  name="microphone" 
+                  size={16} 
+                  color={isRecording ? '#FFFFFF' : '#6B5B95'} 
+                />
+              </TouchableOpacity>
               {inputText.length > 0 && (
                 <TouchableOpacity style={styles.inputActionButton} onPress={handleClear}>
-                  <FontAwesome6 name="xmark" size={16} color={theme.textMuted} />
+                  <FontAwesome6 name="xmark" size={16} color="#666666" />
                 </TouchableOpacity>
               )}
             </View>
@@ -299,7 +458,7 @@ export default function TranslateScreen() {
         >
           {isTranslating ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator color={theme.buttonPrimaryText} size="small" />
+              <ActivityIndicator color="#FFFFFF" size="small" />
               <ThemedText style={styles.translateButtonText}>翻译中...</ThemedText>
             </View>
           ) : (
@@ -317,9 +476,8 @@ export default function TranslateScreen() {
         {/* Output Sections */}
         {hasOutput && (
           <View style={styles.resultsContainer}>
-            {/* 主翻译结果（突出显示） */}
+            {/* 主翻译结果 */}
             <View style={styles.primaryOutputSection}>
-              {/* 深色标题行 */}
               <View style={styles.primaryOutputHeader}>
                 <View style={styles.primaryOutputLabel}>
                   <View style={styles.primaryOutputLabelIcon}>
@@ -331,15 +489,29 @@ export default function TranslateScreen() {
                     </ThemedText>
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.primaryCopyButton}
-                  onPress={() => handleCopy(primaryTranslation.text)}
-                >
-                  <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
-                  <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={styles.primaryCopyButton}
+                    onPress={() => playTTS(primaryTranslation.text, primaryTranslation.lang, true)}
+                  >
+                    <FontAwesome6 
+                      name={isPlayingPrimary ? "stop" : "volume-high"} 
+                      size={12} 
+                      color="#FFFFFF" 
+                    />
+                    <ThemedText variant="caption" color="#FFFFFF">
+                      {isPlayingPrimary ? '停止' : '播放'}
+                    </ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.primaryCopyButton}
+                    onPress={() => handleCopy(primaryTranslation.text)}
+                  >
+                    <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
+                    <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
+                  </TouchableOpacity>
+                </View>
               </View>
-              {/* 浅色内容区 */}
               <View style={styles.primaryOutputContainer}>
                 <ThemedText
                   style={[
@@ -352,9 +524,8 @@ export default function TranslateScreen() {
               </View>
             </View>
 
-            {/* 参考翻译（次要显示） */}
+            {/* 参考翻译 */}
             <View style={styles.referenceOutputSection}>
-              {/* 深色标题行 */}
               <View style={styles.referenceOutputHeader}>
                 <View style={styles.referenceOutputLabel}>
                   <View style={styles.referenceOutputLabelIcon}>
@@ -366,15 +537,29 @@ export default function TranslateScreen() {
                     </ThemedText>
                   </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.primaryCopyButton}
-                  onPress={() => handleCopy(referenceTranslation.text)}
-                >
-                  <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
-                  <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TouchableOpacity
+                    style={styles.primaryCopyButton}
+                    onPress={() => playTTS(referenceTranslation.text, referenceTranslation.lang, false)}
+                  >
+                    <FontAwesome6 
+                      name={isPlayingReference ? "stop" : "volume-high"} 
+                      size={12} 
+                      color="#FFFFFF" 
+                    />
+                    <ThemedText variant="caption" color="#FFFFFF">
+                      {isPlayingReference ? '停止' : '播放'}
+                    </ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.primaryCopyButton}
+                    onPress={() => handleCopy(referenceTranslation.text)}
+                  >
+                    <FontAwesome6 name="copy" size={12} color="#FFFFFF" />
+                    <ThemedText variant="caption" color="#FFFFFF">复制</ThemedText>
+                  </TouchableOpacity>
+                </View>
               </View>
-              {/* 浅色内容区 */}
               <View style={styles.referenceOutputContainer}>
                 <ThemedText
                   style={[
@@ -389,15 +574,15 @@ export default function TranslateScreen() {
           </View>
         )}
 
-        {/* History Section - 最近3条 */}
+        {/* History Section */}
         {history.length > 0 && (
           <View style={styles.historySection}>
             <View style={styles.historyHeader}>
-              <ThemedText variant="title" color={theme.textPrimary} style={styles.historyTitle}>
+              <ThemedText variant="title" style={styles.historyTitle}>
                 历史记录
               </ThemedText>
               <TouchableOpacity style={styles.clearAllButton} onPress={handleClearHistory}>
-                <ThemedText variant="small" color={theme.error}>清空</ThemedText>
+                <ThemedText variant="small" color="#E57373">清空</ThemedText>
               </TouchableOpacity>
             </View>
 
@@ -433,7 +618,7 @@ export default function TranslateScreen() {
                       style={styles.historyItemDelete}
                       onPress={() => handleDeleteHistoryItem(item.id)}
                     >
-                      <FontAwesome6 name="xmark" size={12} color={theme.textMuted} />
+                      <FontAwesome6 name="xmark" size={12} color="#999999" />
                     </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
@@ -445,8 +630,8 @@ export default function TranslateScreen() {
         {/* Empty History */}
         {history.length === 0 && (
           <View style={styles.emptyHistory}>
-            <FontAwesome6 name="clock-rotate-left" size={36} color={theme.textMuted} />
-            <ThemedText variant="small" color={theme.textMuted} style={styles.emptyHistoryText}>
+            <FontAwesome6 name="clock-rotate-left" size={36} color="#CCCCCC" />
+            <ThemedText variant="small" style={styles.emptyHistoryText}>
               暂无历史记录
             </ThemedText>
           </View>
