@@ -9,19 +9,17 @@ export const createStyles = (theme: Theme) => {
     },
     scrollContent: {
       flexGrow: 1,
-      paddingHorizontal: Spacing.lg, // 左右留出间距
-      paddingTop: Spacing.lg, // 顶部间距
+      paddingHorizontal: Spacing.lg,
+      paddingTop: Spacing.xl,
       paddingBottom: Spacing['4xl'],
     },
     header: {
       marginBottom: Spacing.lg,
-      marginTop: Spacing.sm, // 顶部间距
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 深紫色背景
       paddingVertical: Spacing.lg,
+      marginHorizontal: -Spacing.lg, // 填充满整行
       paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.xl, // 圆角
-      // 不设置 marginHorizontal，依赖 scrollContent 的 paddingHorizontal 留出边距
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
