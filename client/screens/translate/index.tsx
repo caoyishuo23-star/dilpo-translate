@@ -49,8 +49,8 @@ export default function TranslateScreen() {
 
   // 语言状态 - 三种语言
   const [sourceLang, setSourceLang] = useState<LanguageCode>('auto'); // 第一语言（支持自动检测）
-  const [primaryLang, setPrimaryLang] = useState<LanguageCode>('en'); // 第二语言
-  const [secondaryLang, setSecondaryLang] = useState<LanguageCode>('ur'); // 第三语言
+  const [primaryLang, setPrimaryLang] = useState<LanguageCode>('ur'); // 第二语言（默认乌尔都语）
+  const [secondaryLang, setSecondaryLang] = useState<LanguageCode>('en'); // 第三语言（默认英文）
   
   const [inputText, setInputText] = useState('');
   const [primaryText, setPrimaryText] = useState('');
