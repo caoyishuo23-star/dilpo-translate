@@ -11,14 +11,11 @@ export const createStyles = (theme: Theme) => {
       flexGrow: 1,
       backgroundColor: '#FAFAFA', // 内容区域浅色背景
       paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing.lg,
+      paddingTop: Spacing.lg, // 内容区域顶部间距
       paddingBottom: Spacing['4xl'],
-      borderTopLeftRadius: BorderRadius.xl, // 顶部圆角
-      borderTopRightRadius: BorderRadius.xl, // 顶部圆角
-      marginTop: -Spacing.lg, // 向上覆盖，让圆角生效
     },
     header: {
-      marginBottom: 0, // 无底部间距
+      marginBottom: Spacing.lg,
       marginTop: 0, // 从顶部开始
       marginHorizontal: 0, // 左右填满屏幕
       alignItems: 'center',

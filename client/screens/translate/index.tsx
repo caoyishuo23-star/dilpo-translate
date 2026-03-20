@@ -411,7 +411,11 @@ export default function TranslateScreen() {
   const hasOutput = primaryText || secondaryText;
 
   return (
-    <Screen backgroundColor="#8B7DB8" statusBarStyle="light">
+    <Screen 
+      backgroundColor="#8B7DB8" 
+      statusBarStyle="light"
+      safeAreaEdges={['left', 'right', 'bottom']} // 禁用顶部安全区
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <ThemedView level="root" style={styles.header}>
