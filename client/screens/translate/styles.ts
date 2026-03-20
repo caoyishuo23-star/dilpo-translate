@@ -9,18 +9,20 @@ export const createStyles = (theme: Theme) => {
     },
     scrollContent: {
       flexGrow: 1,
+      backgroundColor: '#FAFAFA', // 内容区域浅色背景
       paddingHorizontal: Spacing.lg,
-      paddingTop: 0, // Header 会处理顶部间距
+      paddingTop: Spacing.lg,
       paddingBottom: Spacing['4xl'],
     },
     header: {
       marginBottom: Spacing.lg,
-      marginTop: 0, // 从顶部开始
-      marginHorizontal: -Spacing.lg, // 左右填满屏幕
+      marginTop: Spacing.md, // 顶部间距
+      marginHorizontal: Spacing.sm, // 左右留出边距
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 淡紫色背景
-      paddingBottom: Spacing.lg,
+      paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.lg,
+      borderRadius: BorderRadius.xl, // 圆角
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
