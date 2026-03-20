@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
+  Alert,
 } from 'react-native';
+import { Audio } from 'expo-av';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
@@ -52,11 +54,24 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
   const [isLoadingIELTS, setIsLoadingIELTS] = useState(false);
   const [activeTab, setActiveTab] = useState<'phrases' | 'ielts'>('phrases');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  
+  const soundRef = useRef<Audio.Sound | null>(null);
 
+  const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
   const langInfo = getLanguageByCode(primaryLang);
   const phrases = getPhrasesForLanguage(primaryLang);
   const isEnglish = primaryLang === 'en';
   const hasRecentWords = recentWords.length > 0;
+
+  // 清理音频资源
+  useEffect(() => {
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, []);
 
   // 获取相关句子
   useEffect(() => {
@@ -75,6 +90,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
   // 切换Tab时重置展开状态
   useEffect(() => {
     setIsExpanded(false);
+    stopPlaying();
   }, [activeTab]);
 
   const fetchRelatedSentences = async () => {
@@ -82,7 +98,6 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
     
     setIsLoadingRelated(true);
     try {
-      const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/learning/related`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -109,7 +124,6 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
     
     setIsLoadingIELTS(true);
     try {
-      const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/learning/ielts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -127,6 +141,59 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
       console.error('Failed to fetch IELTS sentences:', e);
     } finally {
       setIsLoadingIELTS(false);
+    }
+  };
+
+  // 停止播放
+  const stopPlaying = async () => {
+    if (soundRef.current) {
+      await soundRef.current.stopAsync();
+      await soundRef.current.unloadAsync();
+      soundRef.current = null;
+    }
+    setPlayingId(null);
+  };
+
+  // 播放TTS
+  const playTTS = async (text: string, lang: LanguageCode, id: string) => {
+    // 如果正在播放同一个，停止
+    if (playingId === id) {
+      await stopPlaying();
+      return;
+    }
+
+    // 停止之前的播放
+    await stopPlaying();
+
+    try {
+      /**
+       * 服务端文件：server/src/routes/audio.ts
+       * 接口：POST /api/v1/audio/tts
+       * Body 参数：text: string, lang: string
+       */
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/audio/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data?.audioUri) {
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: data.data.audioUri },
+          { shouldPlay: true, isLooping: false },
+          (status) => {
+            if (status.isLoaded && status.didJustFinish) {
+              setPlayingId(null);
+            }
+          }
+        );
+        soundRef.current = sound;
+        setPlayingId(id);
+      }
+    } catch (e) {
+      console.error('TTS error:', e);
     }
   };
 
@@ -205,51 +272,56 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             相关学习
           </ThemedText>
         </View>
-        {relatedSentences.map((item, index) => (
-          <View
-            key={index}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              paddingVertical: Spacing.xs + 2,
-              borderBottomWidth: 1,
-              borderBottomColor: '#F5F5F5',
-            }}
-          >
-            <View style={{ flex: 1 }}>
-              <ThemedText
-                style={{
-                  fontSize: 12,
-                  color: '#1A1A2E',
-                }}
-              >
-                {item.source}
-              </ThemedText>
-              <ThemedText
-                style={{
-                  fontSize: 13,
-                  fontWeight: '600',
-                  color: '#6B5B95',
-                  textAlign: langInfo.isRTL ? 'right' : 'left',
-                }}
-              >
-                {item.target}
-              </ThemedText>
-            </View>
+        {relatedSentences.map((item, index) => {
+          const itemId = `related-${index}`;
+          const isPlaying = playingId === itemId;
+          return (
             <View
+              key={index}
               style={{
-                backgroundColor: '#FEF3C7',
-                paddingVertical: 1,
-                paddingHorizontal: Spacing.xs,
-                borderRadius: BorderRadius.sm,
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                paddingVertical: Spacing.xs + 2,
+                borderBottomWidth: 1,
+                borderBottomColor: '#F5F5F5',
               }}
             >
-              <ThemedText style={{ fontSize: 9, color: '#F59E0B' }}>
-                {item.word}
-              </ThemedText>
+              <View style={{ flex: 1 }}>
+                <ThemedText
+                  style={{
+                    fontSize: 12,
+                    color: '#1A1A2E',
+                  }}
+                >
+                  {item.source}
+                </ThemedText>
+                <ThemedText
+                  style={{
+                    fontSize: 13,
+                    fontWeight: '600',
+                    color: '#6B5B95',
+                    textAlign: langInfo.isRTL ? 'right' : 'left',
+                  }}
+                >
+                  {item.target}
+                </ThemedText>
+              </View>
+              <TouchableOpacity
+                style={{
+                  padding: Spacing.xs,
+                  marginLeft: Spacing.xs,
+                }}
+                onPress={() => playTTS(item.target, primaryLang, itemId)}
+              >
+                <FontAwesome6 
+                  name={isPlaying ? "stop" : "volume-high"} 
+                  size={14} 
+                  color={isPlaying ? '#F59E0B' : '#999999'} 
+                />
+              </TouchableOpacity>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </View>
     );
   };
@@ -294,39 +366,56 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
             >
               {categoryNames[cat.category]}
             </ThemedText>
-            {cat.phrases.slice(0, 5).map((phrase, index) => (
-              <View
-                key={index}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  paddingVertical: Spacing.xs + 2,
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#F5F5F5',
-                }}
-              >
-                <View style={{ flex: 1 }}>
-                  <ThemedText
+            {cat.phrases.slice(0, 5).map((phrase, index) => {
+              const itemId = `phrase-${cat.category}-${index}`;
+              const isPlaying = playingId === itemId;
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    paddingVertical: Spacing.xs + 2,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#F5F5F5',
+                  }}
+                >
+                  <View style={{ flex: 1 }}>
+                    <ThemedText
+                      style={{
+                        fontSize: 12,
+                        color: '#1A1A2E',
+                      }}
+                    >
+                      {phrase.source}
+                    </ThemedText>
+                    <ThemedText
+                      style={{
+                        fontSize: 13,
+                        fontWeight: '600',
+                        color: '#6B5B95',
+                        textAlign: langInfo.isRTL ? 'right' : 'left',
+                      }}
+                    >
+                      {phrase.target}
+                    </ThemedText>
+                  </View>
+                  <TouchableOpacity
                     style={{
-                      fontSize: 12,
-                      color: '#1A1A2E',
+                      padding: Spacing.xs,
+                      marginLeft: Spacing.xs,
                     }}
+                    onPress={() => playTTS(phrase.target, primaryLang, itemId)}
                   >
-                    {phrase.source}
-                  </ThemedText>
-                  <ThemedText
-                    style={{
-                      fontSize: 13,
-                      fontWeight: '600',
-                      color: '#6B5B95',
-                      textAlign: langInfo.isRTL ? 'right' : 'left',
-                    }}
-                  >
-                    {phrase.target}
-                  </ThemedText>
+                    <FontAwesome6 
+                      name={isPlaying ? "stop" : "volume-high"} 
+                      size={14} 
+                      color={isPlaying ? '#8B7DB8' : '#999999'} 
+                    />
+                  </TouchableOpacity>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         ))}
       </View>
@@ -371,85 +460,100 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
 
     return (
       <View>
-        {ieltSentences.map((item, index) => (
-          <View
-            key={index}
-            style={{
-              backgroundColor: '#FAF8FF',
-              borderRadius: BorderRadius.md,
-              padding: Spacing.sm,
-              marginBottom: Spacing.sm,
-              borderLeftWidth: 2,
-              borderLeftColor: '#8B7DB8',
-            }}
-          >
+        {ieltSentences.map((item, index) => {
+          const itemId = `ielts-${index}`;
+          const isPlaying = playingId === itemId;
+          return (
             <View
+              key={index}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: Spacing.xs,
+                backgroundColor: '#FAF8FF',
+                borderRadius: BorderRadius.md,
+                padding: Spacing.sm,
+                marginBottom: Spacing.sm,
+                borderLeftWidth: 2,
+                borderLeftColor: '#8B7DB8',
               }}
             >
-              <View
-                style={{
-                  backgroundColor: '#8B7DB8',
-                  paddingVertical: 1,
-                  paddingHorizontal: Spacing.xs,
-                  borderRadius: BorderRadius.sm,
-                }}
-              >
-                <ThemedText style={{ fontSize: 9, color: '#FFFFFF', fontWeight: '600' }}>
-                  {item.type}
-                </ThemedText>
-              </View>
-            </View>
-            <ThemedText
-              style={{
-                fontSize: 12,
-                color: '#1A1A2E',
-                lineHeight: 18,
-                marginBottom: Spacing.xs,
-              }}
-            >
-              {item.sentence}
-            </ThemedText>
-            <ThemedText
-              style={{
-                fontSize: 11,
-                color: '#666666',
-                lineHeight: 16,
-              }}
-            >
-              {item.translation}
-            </ThemedText>
-            {item.vocabulary && item.vocabulary.length > 0 && (
               <View
                 style={{
                   flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  gap: Spacing.xs,
-                  marginTop: Spacing.xs,
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: Spacing.xs,
                 }}
               >
-                {item.vocabulary.map((word, i) => (
-                  <View
-                    key={i}
-                    style={{
-                      backgroundColor: '#F0EBFF',
-                      paddingVertical: 1,
-                      paddingHorizontal: Spacing.xs,
-                      borderRadius: BorderRadius.sm,
-                    }}
-                  >
-                    <ThemedText style={{ fontSize: 10, color: '#6B5B95' }}>
-                      {word}
-                    </ThemedText>
-                  </View>
-                ))}
+                <View
+                  style={{
+                    backgroundColor: '#8B7DB8',
+                    paddingVertical: 1,
+                    paddingHorizontal: Spacing.xs,
+                    borderRadius: BorderRadius.sm,
+                  }}
+                >
+                  <ThemedText style={{ fontSize: 9, color: '#FFFFFF', fontWeight: '600' }}>
+                    {item.type}
+                  </ThemedText>
+                </View>
+                <TouchableOpacity
+                  style={{ padding: Spacing.xs }}
+                  onPress={() => playTTS(item.sentence, 'en', itemId)}
+                >
+                  <FontAwesome6 
+                    name={isPlaying ? "stop" : "volume-high"} 
+                    size={14} 
+                    color={isPlaying ? '#8B7DB8' : '#999999'} 
+                  />
+                </TouchableOpacity>
               </View>
-            )}
-          </View>
-        ))}
+              <ThemedText
+                style={{
+                  fontSize: 12,
+                  color: '#1A1A2E',
+                  lineHeight: 18,
+                  marginBottom: Spacing.xs,
+                }}
+              >
+                {item.sentence}
+              </ThemedText>
+              <ThemedText
+                style={{
+                  fontSize: 11,
+                  color: '#666666',
+                  lineHeight: 16,
+                }}
+              >
+                {item.translation}
+              </ThemedText>
+              {item.vocabulary && item.vocabulary.length > 0 && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: Spacing.xs,
+                    marginTop: Spacing.xs,
+                  }}
+                >
+                  {item.vocabulary.map((word, i) => (
+                    <View
+                      key={i}
+                      style={{
+                        backgroundColor: '#F0EBFF',
+                        paddingVertical: 1,
+                        paddingHorizontal: Spacing.xs,
+                        borderRadius: BorderRadius.sm,
+                      }}
+                    >
+                      <ThemedText style={{ fontSize: 10, color: '#6B5B95' }}>
+                        {word}
+                      </ThemedText>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          );
+        })}
       </View>
     );
   };
