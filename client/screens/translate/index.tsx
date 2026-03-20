@@ -371,9 +371,11 @@ export default function TranslateScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <ThemedView level="root" style={styles.header}>
-          <ThemedText variant="h2" style={styles.headerTitle}>
-            Diplo
-          </ThemedText>
+          <View style={styles.headerTitleContainer}>
+            <ThemedText variant="h2" style={styles.headerTitle}>
+              Diplo
+            </ThemedText>
+          </View>
           <ThemedText variant="small" style={styles.headerSubtitle}>
             Your thoughtful translation assistant
           </ThemedText>

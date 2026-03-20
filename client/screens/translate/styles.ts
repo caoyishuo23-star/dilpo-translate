@@ -15,11 +15,20 @@ export const createStyles = (theme: Theme) => {
     },
     header: {
       marginBottom: Spacing.lg,
+      alignItems: 'center',
+    },
+    headerTitleContainer: {
+      backgroundColor: '#8B7DB8', // 比翻译按钮(#C4B5E8)更深一点的紫色
+      paddingVertical: Spacing.sm + 4,
+      paddingHorizontal: Spacing.xl + 4,
+      borderRadius: BorderRadius.lg,
+      marginBottom: Spacing.xs,
     },
     headerTitle: {
       textAlign: 'center',
-      marginBottom: 2,
-      color: '#1A1A2E', // 深色标题
+      color: '#FFFFFF', // 白色文字
+      fontWeight: '700',
+      letterSpacing: 1,
     },
     headerSubtitle: {
       textAlign: 'center',
