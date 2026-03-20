@@ -19,7 +19,6 @@ export const createStyles = (theme: Theme) => {
       marginHorizontal: -Spacing.lg, // 左右填满屏幕
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 淡紫色背景
-      paddingTop: Spacing['2xl'], // 给状态栏留出空间
       paddingBottom: Spacing.lg,
       paddingHorizontal: Spacing.lg,
     },

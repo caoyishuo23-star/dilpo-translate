@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome6 } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { Audio } from 'expo-av';
@@ -20,6 +21,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTheme } from '@/hooks/useTheme';
 import { createStyles } from './styles';
+import { Spacing } from '@/constants/theme';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { TargetLanguageModal } from '@/components/LanguageSelector';
 import { LearningModule } from '@/components/LearningModule';
@@ -59,6 +61,7 @@ interface HistoryItem {
 export default function TranslateScreen() {
   const { theme, isDark } = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const insets = useSafeAreaInsets(); // 获取安全区高度
 
   // 语言状态 - 三种语言（默认值，会被持久化数据覆盖）
   const [sourceLang, setSourceLang] = useState<LanguageCode>('auto'); // 第一语言（支持自动检测）
@@ -411,10 +414,14 @@ export default function TranslateScreen() {
   const hasOutput = primaryText || secondaryText;
 
   return (
-    <Screen backgroundColor="#FAFAFA" statusBarStyle="light">
+    <Screen 
+      backgroundColor="#8B7DB8" 
+      statusBarStyle="light"
+      safeAreaEdges={['left', 'right', 'bottom']} // 禁用顶部安全区，让 Header 延伸到状态栏
+    >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
-        <ThemedView level="root" style={styles.header}>
+        <ThemedView level="root" style={[styles.header, { paddingTop: insets.top + Spacing.md }]}>
           <View style={styles.headerTitleContainer}>
             <ThemedText variant="h2" style={styles.headerTitle}>
               Diplo
