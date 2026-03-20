@@ -406,7 +406,7 @@ export default function TranslateScreen() {
   const hasOutput = primaryText || secondaryText;
 
   return (
-    <Screen backgroundColor="#FAFAFA" statusBarStyle={isDark ? 'light' : 'dark'}>
+    <Screen backgroundColor="#6B5B95" statusBarStyle="light">
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <ThemedView level="root" style={styles.header}>

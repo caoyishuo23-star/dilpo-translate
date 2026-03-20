@@ -9,19 +9,22 @@ export const createStyles = (theme: Theme) => {
     },
     scrollContent: {
       flexGrow: 1,
+      backgroundColor: '#FAFAFA', // 内容区域浅色背景
       paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing.xl,
+      paddingTop: Spacing.lg,
       paddingBottom: Spacing['4xl'],
+      borderTopLeftRadius: BorderRadius.xl, // 顶部圆角
+      borderTopRightRadius: BorderRadius.xl, // 顶部圆角
     },
     header: {
-      marginBottom: Spacing.lg,
-      marginTop: Spacing.md, // 顶部留出间距，避免遮挡状态栏
-      marginHorizontal: Spacing.sm, // 左右留出边距
+      marginBottom: 0, // 无底部间距，让内容区域向上贴近
+      marginTop: 0, // 从顶部开始
+      marginHorizontal: 0, // 左右填满
       alignItems: 'center',
-      backgroundColor: '#6B5B95', // 更深的紫色背景
-      paddingVertical: Spacing.lg,
+      backgroundColor: '#6B5B95', // 深紫色背景
+      paddingTop: Spacing['2xl'], // 给状态栏留出空间
+      paddingBottom: Spacing.lg,
       paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.xl, // 圆角
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
