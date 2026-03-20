@@ -10,7 +10,7 @@ export const createStyles = (theme: Theme) => {
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing.xl,
+      paddingTop: Spacing.md, // 减少顶部 padding，让 Screen 的安全区生效
       paddingBottom: Spacing['4xl'],
     },
     header: {
@@ -18,8 +18,9 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       backgroundColor: '#8B7DB8', // 深紫色背景
       paddingVertical: Spacing.lg,
-      marginHorizontal: -Spacing.lg, // 填充满整行
       paddingHorizontal: Spacing.lg,
+      borderRadius: BorderRadius.xl, // 添加圆角，更现代
+      marginTop: Spacing.sm, // 增加顶部间距，避免遮挡状态栏
     },
     headerTitleContainer: {
       backgroundColor: 'transparent', // 透明，使用header的背景
