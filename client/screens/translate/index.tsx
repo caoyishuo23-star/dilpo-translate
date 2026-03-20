@@ -372,39 +372,41 @@ export default function TranslateScreen() {
         {/* Header */}
         <ThemedView level="root" style={styles.header}>
           <ThemedText variant="h2" style={styles.headerTitle}>
-            乌尔都语翻译
+            Diplo
           </ThemedText>
           <ThemedText variant="small" style={styles.headerSubtitle}>
-            输入文本，获取乌尔都语翻译
+            Your thoughtful translation assistant
           </ThemedText>
         </ThemedView>
 
-        {/* Language Selector */}
+        {/* Language Selector - 左右箭头形式 */}
         <View style={styles.languageSelector}>
-          {(['zh', 'en', 'ur'] as Language[]).map((lang) => (
-            <TouchableOpacity
-              key={lang}
-              style={[
-                styles.languageButton,
-                sourceLang === lang && styles.languageButtonActive,
-              ]}
-              onPress={() => setSourceLang(lang)}
-            >
-              <FontAwesome6
-                name={languageIcons[lang]}
-                size={12}
-                color={sourceLang === lang ? '#6B5B95' : '#999999'}
-              />
-              <ThemedText
-                style={[
-                  styles.languageButtonText,
-                  sourceLang === lang && styles.languageButtonTextActive,
-                ]}
-              >
-                {languageNames[lang]}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
+          {/* 源语言选择 */}
+          <TouchableOpacity
+            style={styles.langSelectButton}
+            onPress={() => {
+              // 循环切换源语言
+              const langs: Language[] = ['zh', 'en', 'ur'];
+              const currentIndex = langs.indexOf(sourceLang);
+              const nextIndex = (currentIndex + 1) % langs.length;
+              setSourceLang(langs[nextIndex]);
+            }}
+          >
+            <ThemedText style={styles.langSelectText}>
+              {languageNames[sourceLang]}
+            </ThemedText>
+            <FontAwesome6 name="chevron-down" size={10} color="#6B5B95" />
+          </TouchableOpacity>
+
+          {/* 切换按钮 */}
+          <TouchableOpacity style={styles.swapButton}>
+            <FontAwesome6 name="arrow-right-arrow-left" size={16} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          {/* 目标语言 */}
+          <View style={styles.targetLangButton}>
+            <ThemedText style={styles.targetLangText}>اردو + English</ThemedText>
+          </View>
         </View>
 
         {/* Input Section */}
