@@ -196,17 +196,17 @@ export default function TranslateScreen() {
   // 判断是否是RTL语言
   const isRTLLanguage = (lang: Language) => lang === 'ur';
 
-  // 根据源语言决定显示哪些翻译结果
+  // 根据源语言决定显示哪些翻译结果（乌尔都语在上，英文在下）
   const getOutputConfigs = () => {
     if (sourceLang === 'zh') {
       return [
-        { key: 'en', label: 'English', text: englishText, isRTL: false },
         { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
+        { key: 'en', label: 'English', text: englishText, isRTL: false },
       ];
     } else if (sourceLang === 'en') {
       return [
-        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
         { key: 'ur', label: 'اردو', text: urduText, isRTL: true },
+        { key: 'zh', label: '中文', text: chineseText, isRTL: false },
       ];
     } else {
       return [
