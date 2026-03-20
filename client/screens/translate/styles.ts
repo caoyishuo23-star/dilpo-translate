@@ -18,7 +18,7 @@ export const createStyles = (theme: Theme) => {
       marginTop: Spacing.md, // 顶部留出间距，避免遮挡状态栏
       marginHorizontal: Spacing.sm, // 左右留出边距
       alignItems: 'center',
-      backgroundColor: '#8B7DB8', // 深紫色背景
+      backgroundColor: '#6B5B95', // 更深的紫色背景
       paddingVertical: Spacing.lg,
       paddingHorizontal: Spacing.lg,
       borderRadius: BorderRadius.xl, // 圆角
@@ -55,10 +55,10 @@ export const createStyles = (theme: Theme) => {
       width: 40,
       height: 40,
       borderRadius: BorderRadius.full,
-      backgroundColor: '#8B7DB8',
+      backgroundColor: '#6B5B95',
       alignItems: 'center',
       justifyContent: 'center',
-      shadowColor: '#8B7DB8',
+      shadowColor: '#6B5B95',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
