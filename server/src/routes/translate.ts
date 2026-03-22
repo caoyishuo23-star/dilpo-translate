@@ -77,7 +77,7 @@ const languageNames: Record<string, string> = {
   eo: "世界语",
 };
 
-// 翻译接口 - 优化版：合并检测和翻译为一次LLM调用
+// 翻译接口 - 使用千问 API
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { text, sourceLang, autoDetect, targetLangs } = req.body;
@@ -90,12 +90,15 @@ router.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    // 创建LLM客户端
-    const customHeaders = HeaderUtils.extractForwardHeaders(
-      req.headers as Record<string, string>
-    );
-    const config = new Config();
-    const client = new LLMClient(config, customHeaders);
+    // 获取 API Key
+    const apiKey = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY;
+    if (!apiKey) {
+      console.error("Missing QWEN_API_KEY environment variable");
+      return res.status(500).json({
+        success: false,
+        error: "服务配置错误，请联系管理员",
+      });
+    }
 
     // 获取目标语言列表
     const langs = targetLangs || ["en", "ur"];
@@ -106,12 +109,11 @@ router.post("/", async (req: Request, res: Response) => {
     const needDetect = autoDetect || sourceLang === "auto" || !sourceLang;
     const knownSourceLang = needDetect ? "检测出的源语言" : (languageNames[sourceLang] || sourceLang);
 
-    // 构建合并的系统提示
+    // 构建系统提示
     let systemPrompt: string;
     let userPrompt: string;
 
     if (needDetect) {
-      // 自动检测 + 翻译合并
       systemPrompt = `你是专业翻译。根据用户文本，完成以下任务并返回JSON格式：
 1. 检测源语言（返回语言代码，如zh/en/ja等）
 2. 翻译到指定目标语言
@@ -123,7 +125,6 @@ router.post("/", async (req: Request, res: Response) => {
 目标语言：${targetLangList}
 请检测源语言并翻译。`;
     } else {
-      // 仅翻译（已知源语言）
       systemPrompt = `你是专业翻译。将文本翻译到指定目标语言，返回JSON格式。
 只返回翻译结果，不要有任何其他内容。
 
@@ -135,22 +136,40 @@ ${text}
 目标语言代码：${targetLangList}`;
     }
 
-    const messages = [
-      { role: "system" as const, content: systemPrompt },
-      { role: "user" as const, content: userPrompt },
-    ];
-
-    const response = await client.invoke(messages, {
-      model: "doubao-seed-1-6-251015",
-      temperature: 0.3,
+    // 调用千问 API
+    const response = await fetch(QWEN_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: QWEN_MODEL,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.3,
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Qwen API error:", response.status, errorText);
+      return res.status(500).json({
+        success: false,
+        error: "翻译服务暂时不可用，请稍后重试",
+      });
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
 
     // 解析JSON结果
     let detectedLang: string | null = null;
     const result: Record<string, string> = {};
 
     try {
-      const content = response.content.trim();
       // 提取JSON部分
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -158,7 +177,6 @@ ${text}
         
         if (parsed.detected) {
           const detected = String(parsed.detected).toLowerCase().substring(0, 2);
-          // 验证语言代码
           detectedLang = detected in languageNames ? detected : "zh";
         }
         
@@ -168,9 +186,8 @@ ${text}
       }
     } catch (parseError) {
       console.error("Parse error:", parseError);
-      // 解析失败时的回退处理
       langs.forEach((lang: string) => {
-        result[lang] = response.content;
+        result[lang] = content;
       });
     }
 
