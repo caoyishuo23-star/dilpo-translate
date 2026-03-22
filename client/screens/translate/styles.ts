@@ -9,19 +9,14 @@ export const createStyles = (theme: Theme) => {
     },
     scrollContent: {
       flexGrow: 1,
-      backgroundColor: '#FAFAFA', // 内容区域浅色背景
-      paddingHorizontal: Spacing.lg,
-      paddingTop: Spacing.lg, // 内容区域顶部间距
+      backgroundColor: '#8B7DB8', // 紫色背景满铺
       paddingBottom: Spacing['4xl'],
     },
     header: {
-      marginBottom: Spacing.lg,
-      marginTop: 0, // 从顶部开始
-      marginHorizontal: 0, // 左右填满屏幕
       alignItems: 'center',
-      backgroundColor: '#8B7DB8', // 淡紫色背景
-      paddingTop: Spacing['2xl'], // 给状态栏留出空间
-      paddingBottom: Spacing.lg,
+      backgroundColor: '#8B7DB8', // 紫色背景
+      paddingTop: Spacing['3xl'], // 状态栏空间
+      paddingBottom: Spacing.xl,
       paddingHorizontal: Spacing.lg,
     },
     headerTitleContainer: {
@@ -39,18 +34,24 @@ export const createStyles = (theme: Theme) => {
       textAlign: 'center',
       color: 'rgba(255,255,255,0.85)', // 半透明白色
     },
+    // 白色内容卡片（包裹语言选择器下方的所有内容）
+    contentCard: {
+      flex: 1,
+      backgroundColor: '#FAFAFA',
+      paddingHorizontal: Spacing.lg,
+      paddingTop: Spacing.lg,
+    },
     // 语言选择器 - 简洁形式
     languageSelector: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: Spacing.lg,
+      marginBottom: 0, // 去掉底部间距，用 contentCard 的 padding 代替
       gap: Spacing.sm,
       backgroundColor: '#FFFFFF',
-      borderRadius: BorderRadius.xl,
-      padding: Spacing.sm,
-      borderWidth: 1,
-      borderColor: '#E8E8E8',
+      borderRadius: 0, // 无圆角，顶部紧贴
+      padding: Spacing.md,
+      borderBottomWidth: 0,
     },
     arrowButton: {
       width: 40,

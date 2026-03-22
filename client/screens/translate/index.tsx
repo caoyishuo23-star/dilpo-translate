@@ -472,6 +472,9 @@ export default function TranslateScreen() {
           />
         )}
 
+        {/* 白色内容卡片区域 */}
+        <View style={styles.contentCard}>
+
         {/* Input Section */}
         <View style={styles.inputSection}>
           <ThemedText variant="smallMedium" style={styles.inputLabel}>
@@ -692,6 +695,7 @@ export default function TranslateScreen() {
           primaryLang={primaryLang}
           recentWords={history.slice(0, 5).map(item => item.sourceText)}
         />
+        </View>{/* contentCard 结束 */}
       </ScrollView>
     </Screen>
   );
