@@ -11,6 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome6 } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Constants from 'expo-constants';
@@ -84,7 +85,6 @@ export default function TranslateScreen() {
 
   // 引用
   const recordingRef = useRef<Audio.Recording | null>(null);
-  const soundRef = useRef<Audio.Sound | null>(null);
 
   // 加载历史记录和语言设置
   useEffect(() => {
@@ -242,53 +242,53 @@ export default function TranslateScreen() {
     }
   };
 
-  // 播放语音
+  // 播放语音 - 使用 expo-speech 本地语音合成
   const playTTS = async (text: string, lang: LanguageCode, isPrimaryOutput: boolean) => {
     const playingState = isPrimaryOutput ? isPlayingPrimary : isPlayingSecondary;
     const setPlayingState = isPrimaryOutput ? setIsPlayingPrimary : setIsPlayingSecondary;
 
-    if (playingState && soundRef.current) {
-      // 正在播放，停止
-      await soundRef.current.stopAsync();
-      await soundRef.current.unloadAsync();
-      soundRef.current = null;
+    // 如果正在播放，停止
+    if (playingState) {
+      Speech.stop();
       setPlayingState(false);
       return;
     }
 
     try {
-      /**
-       * 服务端文件：server/src/routes/audio.ts
-       * 接口：POST /api/v1/audio/tts
-       * Body 参数：text: string, lang: string
-       */
-      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/audio/tts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang }),
+      // 语言代码映射到语音语言
+      const langMap: Record<string, string> = {
+        'zh': 'zh-CN',
+        'en': 'en-US',
+        'ja': 'ja-JP',
+        'ko': 'ko-KR',
+        'ur': 'ur-PK',
+        'ar': 'ar-SA',
+        'fr': 'fr-FR',
+        'de': 'de-DE',
+        'es': 'es-ES',
+        'pt': 'pt-PT',
+        'ru': 'ru-RU',
+        'hi': 'hi-IN',
+      };
+
+      const speechLang = langMap[lang] || 'en-US';
+
+      setPlayingState(true);
+
+      Speech.speak(text, {
+        language: speechLang,
+        rate: 0.9,
+        onDone: () => setPlayingState(false),
+        onError: () => {
+          setPlayingState(false);
+          Alert.alert('提示', '语音播放失败');
+        },
+        onStopped: () => setPlayingState(false),
       });
-
-      const data = await response.json();
-
-      if (data.success && data.data?.audioUri) {
-        // 播放音频
-        const { sound } = await Audio.Sound.createAsync(
-          { uri: data.data.audioUri },
-          { shouldPlay: true, isLooping: false },
-          (status) => {
-            if (status.isLoaded && status.didJustFinish) {
-              setPlayingState(false);
-            }
-          }
-        );
-        soundRef.current = sound;
-        setPlayingState(true);
-      } else {
-        Alert.alert('提示', '语音合成失败');
-      }
     } catch (e) {
       console.error('TTS error:', e);
-      Alert.alert('错误', '语音服务暂时不可用');
+      setPlayingState(false);
+      Alert.alert('错误', '语音播放失败');
     }
   };
 
