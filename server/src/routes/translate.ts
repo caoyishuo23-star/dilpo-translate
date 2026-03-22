@@ -90,8 +90,8 @@ router.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    // 获取 API Key
-    const apiKey = process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY;
+    // 获取 API Key（支持多种变量名）
+    const apiKey = process.env.qwen || process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY;
     if (!apiKey) {
       console.error("Missing QWEN_API_KEY environment variable");
       return res.status(500).json({
