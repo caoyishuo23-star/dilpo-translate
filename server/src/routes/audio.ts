@@ -21,16 +21,17 @@ router.post("/tts", async (req: Request, res: Response) => {
       req.headers as Record<string, string>
     );
     
-    // 从环境变量获取 API Key
-    const apiKey = process.env.COZE_API_KEY;
+    // 从环境变量获取 API Key（支持多种变量名）
+    const apiKey = process.env.COZE_API_KEY || process.env.COZE_WORKLOAD_IDENTITY_API_KEY;
     console.log("TTS - COZE_API_KEY exists:", !!apiKey);
     console.log("TTS - COZE_API_KEY length:", apiKey?.length || 0);
     
-    // 配置 API Key 和 baseUrl
-    const config = apiKey ? new Config({ 
-      apiKey,
-      baseUrl: "https://api.coze.cn"
-    }) : new Config();
+    // 配置 API Key 和 baseUrl（使用 coze.cn 中国版）
+    const config = new Config({ 
+      apiKey: apiKey || undefined,
+      baseUrl: "https://api.coze.cn",
+      modelBaseUrl: "https://model.coze.cn"
+    });
     const client = new TTSClient(config, customHeaders);
 
     // 根据语言选择不同的发音人
@@ -86,14 +87,15 @@ router.post("/asr", upload.single("audio"), async (req: Request, res: Response) 
       req.headers as Record<string, string>
     );
     
-    // 从环境变量获取 API Key
-    const apiKey = process.env.COZE_API_KEY;
+    // 从环境变量获取 API Key（支持多种变量名）
+    const apiKey = process.env.COZE_API_KEY || process.env.COZE_WORKLOAD_IDENTITY_API_KEY;
     
-    // 配置 API Key 和 baseUrl
-    const config = apiKey ? new Config({ 
-      apiKey,
-      baseUrl: "https://api.coze.cn"
-    }) : new Config();
+    // 配置 API Key 和 baseUrl（使用 coze.cn 中国版）
+    const config = new Config({ 
+      apiKey: apiKey || undefined,
+      baseUrl: "https://api.coze.cn",
+      modelBaseUrl: "https://model.coze.cn"
+    });
     const client = new ASRClient(config, customHeaders);
 
     // 将音频文件转为 base64
