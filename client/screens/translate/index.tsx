@@ -453,7 +453,7 @@ export default function TranslateScreen() {
             }}
           >
             <ThemedText style={styles.targetLangText}>
-              {getLanguageByCode(primaryLang).nativeName} + {getLanguageByCode(secondaryLang).nativeName}
+              {getLanguageByCode(secondaryLang).nativeName} + {getLanguageByCode(primaryLang).nativeName}
             </ThemedText>
             <FontAwesome6 name="chevron-down" size={10} color="#666666" />
           </TouchableOpacity>
