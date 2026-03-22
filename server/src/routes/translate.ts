@@ -1,7 +1,10 @@
 import express, { type Request, type Response } from "express";
-import { LLMClient, Config, HeaderUtils } from "coze-coding-dev-sdk";
 
 const router = express.Router();
+
+// 千问 API 配置
+const QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+const QWEN_MODEL = "qwen-plus"; // 可选: qwen-turbo, qwen-plus, qwen-max
 
 // 语言代码映射 - 扩展支持所有语言
 const languageNames: Record<string, string> = {
