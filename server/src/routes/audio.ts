@@ -23,6 +23,9 @@ router.post("/tts", async (req: Request, res: Response) => {
     
     // 从环境变量获取 API Key
     const apiKey = process.env.COZE_API_KEY;
+    console.log("TTS - COZE_API_KEY exists:", !!apiKey);
+    console.log("TTS - COZE_API_KEY length:", apiKey?.length || 0);
+    
     const config = apiKey ? new Config({ apiKey }) : new Config();
     const client = new TTSClient(config, customHeaders);
 
@@ -36,6 +39,8 @@ router.post("/tts", async (req: Request, res: Response) => {
       speaker = "zh_female_vv_uranus_bigtts"; // 日语使用双语发音人
     }
 
+    console.log("TTS - Calling synthesize with:", { text: text.substring(0, 20), speaker });
+
     const response = await client.synthesize({
       uid: "translate_user",
       text,
@@ -44,6 +49,8 @@ router.post("/tts", async (req: Request, res: Response) => {
       sampleRate: 24000,
     });
 
+    console.log("TTS - Success:", response.audioUri);
+
     res.json({
       success: true,
       data: {
@@ -51,8 +58,9 @@ router.post("/tts", async (req: Request, res: Response) => {
         audioSize: response.audioSize,
       },
     });
-  } catch (error) {
-    console.error("TTS error:", error);
+  } catch (error: any) {
+    console.error("TTS error:", error?.message || error);
+    console.error("TTS error stack:", error?.stack);
     res.status(500).json({
       success: false,
       error: "语音合成失败，请稍后重试",
