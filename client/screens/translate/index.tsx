@@ -494,8 +494,8 @@ export default function TranslateScreen() {
               numberOfLines={2}
             />
             <View style={styles.inputActions}>
-              {/* 语音输入按钮 - 暂时隐藏 */}
-              {/* <TouchableOpacity
+              {/* 语音输入按钮 */}
+              <TouchableOpacity
                 style={[styles.voiceButton, isRecording && styles.voiceButtonActive]}
                 onPressIn={startRecording}
                 onPressOut={stopRecording}
@@ -505,7 +505,7 @@ export default function TranslateScreen() {
                   size={16} 
                   color={isRecording ? '#FFFFFF' : '#6B5B95'} 
                 />
-              </TouchableOpacity> */}
+              </TouchableOpacity>
               {inputText.length > 0 && (
                 <TouchableOpacity style={styles.inputActionButton} onPress={handleClear}>
                   <FontAwesome6 name="xmark" size={16} color="#666666" />
@@ -552,8 +552,8 @@ export default function TranslateScreen() {
                     {primaryLangInfo.nativeName}
                   </ThemedText>
                   <View style={styles.outputActions}>
-                    {/* 语音播放按钮 - 暂时隐藏 */}
-                    {/* <TouchableOpacity
+                    {/* 语音播放按钮 */}
+                    <TouchableOpacity
                       style={styles.outputActionButton}
                       onPress={() => playTTS(primaryText, primaryLang, true)}
                     >
@@ -562,7 +562,7 @@ export default function TranslateScreen() {
                         size={14} 
                       color="#6B5B95" 
                     />
-                  </TouchableOpacity> */}
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.outputActionButton}
                     onPress={() => handleCopy(primaryText)}
@@ -588,8 +588,8 @@ export default function TranslateScreen() {
                   {secondaryLangInfo.nativeName}
                 </ThemedText>
                 <View style={styles.outputActions}>
-                  {/* 语音播放按钮 - 暂时隐藏 */}
-                  {/* <TouchableOpacity
+                  {/* 语音播放按钮 */}
+                  <TouchableOpacity
                     style={styles.outputActionButton}
                     onPress={() => playTTS(secondaryText, secondaryLang, false)}
                   >
@@ -598,7 +598,7 @@ export default function TranslateScreen() {
                       size={14} 
                       color="#059669" 
                     />
-                  </TouchableOpacity> */}
+                  </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.outputActionButton}
                     onPress={() => handleCopy(secondaryText)}
