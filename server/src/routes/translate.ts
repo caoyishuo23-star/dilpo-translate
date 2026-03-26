@@ -6,6 +6,9 @@ const router = express.Router();
 const QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 const QWEN_MODEL = "qwen-plus"; // 可选: qwen-turbo, qwen-plus, qwen-max
 
+// 默认 API Key（建议通过环境变量配置）
+const DEFAULT_QWEN_API_KEY = "";
+
 // 语言代码映射 - 扩展支持所有语言
 const languageNames: Record<string, string> = {
   auto: "自动检测",
@@ -90,8 +93,8 @@ router.post("/", async (req: Request, res: Response) => {
       });
     }
 
-    // 获取 API Key（支持多种变量名）
-    const apiKey = process.env.qwen || process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY;
+    // 获取 API Key（支持多种变量名，有默认值兜底）
+    const apiKey = process.env.qwen || process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY || DEFAULT_QWEN_API_KEY;
     if (!apiKey) {
       console.error("Missing QWEN_API_KEY environment variable");
       return res.status(500).json({
