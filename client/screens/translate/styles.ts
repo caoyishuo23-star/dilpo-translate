@@ -184,12 +184,11 @@ export const createStyles = (theme: Theme) => {
     },
     // 转换示意区容器
     translationFlowContainer: {
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: Spacing.md,
-      backgroundColor: '#F5F0FA',
-      borderRadius: BorderRadius.lg,
-      marginVertical: Spacing.xs,
+      gap: Spacing.sm,
     },
     translationFlowContent: {
       flexDirection: 'row',
@@ -199,8 +198,8 @@ export const createStyles = (theme: Theme) => {
     },
     flowLangTag: {
       backgroundColor: '#8B7DB8',
-      paddingVertical: Spacing.xs,
-      paddingHorizontal: Spacing.md,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.lg,
       borderRadius: BorderRadius.full,
     },
     flowLangTagSecondary: {
@@ -208,27 +207,29 @@ export const createStyles = (theme: Theme) => {
     },
     flowLangText: {
       color: '#FFFFFF',
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: '600',
     },
     flowLangTextSecondary: {
       color: '#FFFFFF',
     },
     flowArrowWrapper: {
-      width: 32,
-      height: 32,
+      width: 36,
+      height: 36,
       borderRadius: BorderRadius.full,
       backgroundColor: '#FFFFFF',
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 2,
       borderColor: '#E0D8F0',
+      shadowColor: '#8B7DB8',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.15,
+      shadowRadius: 4,
+      elevation: 2,
     },
     flowHint: {
-      marginTop: Spacing.xs,
-      fontSize: 11,
-      color: '#8B7DB8',
-      opacity: 0.8,
+      display: 'none', // 隐藏提示文字
     },
     // 主翻译结果（第二语言）
     primaryOutputSection: {

@@ -688,24 +688,21 @@ export default function TranslateScreen() {
               </ThemedText>
             </View>
 
-            {/* 弧形箭头 - 转换示意区 */}
+            {/* 转换示意区 - 三个圆形按钮 */}
             <View style={styles.translationFlowContainer}>
-              <View style={styles.translationFlowContent}>
-                <View style={styles.flowLangTag}>
-                  <ThemedText style={styles.flowLangText}>
-                    {primaryLangInfo.nativeName}
-                  </ThemedText>
-                </View>
-                <View style={styles.flowArrowWrapper}>
-                  <FontAwesome6 name="arrow-right" size={14} color="#8B7DB8" />
-                </View>
-                <View style={[styles.flowLangTag, styles.flowLangTagSecondary]}>
-                  <ThemedText style={[styles.flowLangText, styles.flowLangTextSecondary]}>
-                    {secondaryLangInfo.nativeName}
-                  </ThemedText>
-                </View>
+              <View style={styles.flowLangTag}>
+                <ThemedText style={styles.flowLangText}>
+                  {primaryLangInfo.nativeName}
+                </ThemedText>
               </View>
-              <ThemedText style={styles.flowHint}>主翻译 → 参考翻译</ThemedText>
+              <View style={styles.flowArrowWrapper}>
+                <FontAwesome6 name="arrow-right" size={14} color="#8B7DB8" />
+              </View>
+              <View style={[styles.flowLangTag, styles.flowLangTagSecondary]}>
+                <ThemedText style={[styles.flowLangText, styles.flowLangTextSecondary]}>
+                  {secondaryLangInfo.nativeName}
+                </ThemedText>
+              </View>
             </View>
 
             {/* 参考翻译 */}
