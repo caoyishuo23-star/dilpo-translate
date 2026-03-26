@@ -1,11 +1,11 @@
 import express, { type Request, type Response } from "express";
-import { TTSClient, ASRClient, Config, HeaderUtils } from "coze-coding-dev-sdk";
+import { ASRClient, Config, HeaderUtils } from "coze-coding-dev-sdk";
 import multer from "multer";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// TTS - 文字转语音
+// TTS - 文字转语音（提示使用本地引擎）
 router.post("/tts", async (req: Request, res: Response) => {
   try {
     const { text, lang } = req.body;
@@ -17,55 +17,16 @@ router.post("/tts", async (req: Request, res: Response) => {
       });
     }
 
-    const customHeaders = HeaderUtils.extractForwardHeaders(
-      req.headers as Record<string, string>
-    );
-    
-    // 从环境变量获取 API Key（支持多种变量名）
-    const apiKey = process.env.COZE_API_KEY || process.env.COZE_WORKLOAD_IDENTITY_API_KEY;
-    console.log("TTS - COZE_API_KEY exists:", !!apiKey);
-    console.log("TTS - COZE_API_KEY length:", apiKey?.length || 0);
-    
-    // 配置 API Key 和 baseUrl（使用 coze.cn 中国版）
-    const config = new Config({ 
-      apiKey: apiKey || undefined,
-      baseUrl: "https://api.coze.cn",
-      modelBaseUrl: "https://model.coze.cn"
-    });
-    const client = new TTSClient(config, customHeaders);
+    // 云端 TTS 服务暂时不可用，建议使用本地 expo-speech
+    console.log("TTS - Cloud TTS not available, suggest local engine");
 
-    // 根据语言选择不同的发音人
-    let speaker = "zh_female_xiaohe_uranus_bigtts"; // 默认中文女声
-    if (lang === "en") {
-      speaker = "zh_female_vv_uranus_bigtts"; // 中英双语
-    } else if (lang === "ur") {
-      speaker = "zh_female_vv_uranus_bigtts"; // 使用双语发音人
-    } else if (lang === "ja") {
-      speaker = "zh_female_vv_uranus_bigtts"; // 日语使用双语发音人
-    }
-
-    console.log("TTS - Calling synthesize with:", { text: text.substring(0, 20), speaker });
-
-    const response = await client.synthesize({
-      uid: "translate_user",
-      text,
-      speaker,
-      audioFormat: "mp3",
-      sampleRate: 24000,
-    });
-
-    console.log("TTS - Success:", response.audioUri);
-
-    res.json({
-      success: true,
-      data: {
-        audioUri: response.audioUri,
-        audioSize: response.audioSize,
-      },
+    res.status(503).json({
+      success: false,
+      error: "云端TTS服务暂不可用，请使用本地语音引擎",
+      suggestion: "local",
     });
   } catch (error: any) {
     console.error("TTS error:", error?.message || error);
-    console.error("TTS error stack:", error?.stack);
     res.status(500).json({
       success: false,
       error: "语音合成失败，请稍后重试",
@@ -73,7 +34,7 @@ router.post("/tts", async (req: Request, res: Response) => {
   }
 });
 
-// ASR - 语音转文字
+// ASR - 语音转文字（使用 Coze）
 router.post("/asr", upload.single("audio"), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
@@ -87,10 +48,10 @@ router.post("/asr", upload.single("audio"), async (req: Request, res: Response) 
       req.headers as Record<string, string>
     );
     
-    // 从环境变量获取 API Key（支持多种变量名）
+    // 从环境变量获取 API Key
     const apiKey = process.env.COZE_API_KEY || process.env.COZE_WORKLOAD_IDENTITY_API_KEY;
     
-    // 配置 API Key 和 baseUrl（使用 coze.cn 中国版）
+    // 配置 API Key 和 baseUrl
     const config = new Config({ 
       apiKey: apiKey || undefined,
       baseUrl: "https://api.coze.cn",
