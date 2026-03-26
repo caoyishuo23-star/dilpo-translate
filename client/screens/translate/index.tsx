@@ -688,9 +688,24 @@ export default function TranslateScreen() {
               </ThemedText>
             </View>
 
-            {/* 弧形箭头 - 表示从主翻译到参考翻译的转换 */}
-            <View style={styles.arrowContainer}>
-              <CurvedArrow color="#8B7DB8" size={36} />
+            {/* 弧形箭头 - 转换示意区 */}
+            <View style={styles.translationFlowContainer}>
+              <View style={styles.translationFlowContent}>
+                <View style={styles.flowLangTag}>
+                  <ThemedText style={styles.flowLangText}>
+                    {primaryLangInfo.nativeName}
+                  </ThemedText>
+                </View>
+                <View style={styles.flowArrowWrapper}>
+                  <FontAwesome6 name="arrow-right" size={14} color="#8B7DB8" />
+                </View>
+                <View style={[styles.flowLangTag, styles.flowLangTagSecondary]}>
+                  <ThemedText style={[styles.flowLangText, styles.flowLangTextSecondary]}>
+                    {secondaryLangInfo.nativeName}
+                  </ThemedText>
+                </View>
+              </View>
+              <ThemedText style={styles.flowHint}>主翻译 → 参考翻译</ThemedText>
             </View>
 
             {/* 参考翻译 */}

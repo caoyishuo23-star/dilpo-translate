@@ -182,6 +182,54 @@ export const createStyles = (theme: Theme) => {
       justifyContent: 'center',
       paddingVertical: Spacing.xs,
     },
+    // 转换示意区容器
+    translationFlowContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: Spacing.md,
+      backgroundColor: '#F5F0FA',
+      borderRadius: BorderRadius.lg,
+      marginVertical: Spacing.xs,
+    },
+    translationFlowContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.sm,
+    },
+    flowLangTag: {
+      backgroundColor: '#8B7DB8',
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full,
+    },
+    flowLangTagSecondary: {
+      backgroundColor: '#059669',
+    },
+    flowLangText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    flowLangTextSecondary: {
+      color: '#FFFFFF',
+    },
+    flowArrowWrapper: {
+      width: 32,
+      height: 32,
+      borderRadius: BorderRadius.full,
+      backgroundColor: '#FFFFFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: '#E0D8F0',
+    },
+    flowHint: {
+      marginTop: Spacing.xs,
+      fontSize: 11,
+      color: '#8B7DB8',
+      opacity: 0.8,
+    },
     // 主翻译结果（第二语言）
     primaryOutputSection: {
       backgroundColor: '#FFFFFF',
