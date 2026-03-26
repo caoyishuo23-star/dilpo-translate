@@ -263,7 +263,52 @@ export default function TranslateScreen() {
     }
   };
 
-  // 播放语音 - 使用 expo-speech 本地语音合成
+  // 使用云端 TTS 播放语音（后备方案）
+  const playCloudTTS = async (text: string, lang: LanguageCode, setPlayingState: (v: boolean) => void) => {
+    try {
+      /**
+       * 服务端文件：server/src/routes/audio.ts
+       * 接口：POST /api/v1/audio/tts
+       * Body: text: string, lang: string
+       */
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/audio/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang }),
+      });
+
+      if (!response.ok) {
+        throw new Error('TTS service unavailable');
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data?.audioUri) {
+        // 使用 expo-av 播放音频
+        const { sound } = await Audio.Sound.createAsync(
+          { uri: data.data.audioUri },
+          { shouldPlay: true },
+          (status) => {
+            if (status.isLoaded && status.didJustFinish) {
+              setPlayingState(false);
+              sound.unloadAsync();
+            }
+          }
+        );
+      } else {
+        throw new Error('No audio returned');
+      }
+    } catch (e) {
+      console.error('Cloud TTS error:', e);
+      setPlayingState(false);
+      Alert.alert(
+        '语音播放失败',
+        '语音服务暂时不可用，请稍后重试。'
+      );
+    }
+  };
+
+  // 播放语音 - 优先本地TTS，失败时使用云端TTS
   const playTTS = async (text: string, lang: LanguageCode, isPrimaryOutput: boolean) => {
     const playingState = isPrimaryOutput ? isPlayingPrimary : isPlayingSecondary;
     const setPlayingState = isPrimaryOutput ? setIsPlayingPrimary : setIsPlayingSecondary;
@@ -299,43 +344,29 @@ export default function TranslateScreen() {
       };
 
       const speechLang = langMap[lang] || 'en-US';
-
-      // 检查设备是否支持该语言
-      const availableVoices = await Speech.getAvailableVoicesAsync();
-      const supportedLangs = availableVoices
-        .filter(v => v.language && v.language.startsWith(speechLang.split('-')[0]))
-        .map(v => v.language);
-      
-      const finalLang = supportedLangs.length > 0 ? supportedLangs[0] : 'en-US';
       
       setPlayingState(true);
 
+      // 尝试本地 TTS
       Speech.speak(text, {
-        language: finalLang,
+        language: speechLang,
         rate: 0.9,
         pitch: 1.0,
         onDone: () => {
           setPlayingState(false);
         },
         onError: (error) => {
-          console.error('Speech error:', error);
+          console.log('Local TTS failed, trying cloud TTS:', error);
           setPlayingState(false);
-          // 如果设备不支持 TTS，给出友好提示
-          Alert.alert(
-            '语音播放提示',
-            '您的设备可能未安装语音引擎，或当前语言暂不支持语音播放。\n\n提示：可在系统设置中安装 Google 文字转语音引擎。',
-            [{ text: '知道了' }]
-          );
+          // 本地 TTS 失败，尝试云端 TTS
+          playCloudTTS(text, lang, setPlayingState);
         },
         onStopped: () => setPlayingState(false),
       });
     } catch (e) {
       console.error('TTS error:', e);
-      setPlayingState(false);
-      Alert.alert(
-        '语音播放失败',
-        '请确保您的设备已安装语音引擎。\n\n提示：可在系统设置中安装 Google 文字转语音引擎。'
-      );
+      // 尝试云端 TTS
+      await playCloudTTS(text, lang, setPlayingState);
     }
   };
 
