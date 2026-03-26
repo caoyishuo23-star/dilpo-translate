@@ -180,12 +180,13 @@ export const createStyles = (theme: Theme) => {
     resultsRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: Spacing.sm,
+      gap: Spacing.xs,
     },
     // 左侧箭头列
     arrowColumn: {
       justifyContent: 'center',
       alignItems: 'center',
+      width: 24,
     },
     // 右侧输出框列
     outputColumn: {

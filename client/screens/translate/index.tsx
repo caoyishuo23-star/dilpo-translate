@@ -654,7 +654,7 @@ export default function TranslateScreen() {
             <View style={styles.resultsRow}>
               {/* 左侧弧形箭头 */}
               <View style={styles.arrowColumn}>
-                <CurvedArrow color="#8B7DB8" size={40} />
+                <CurvedArrow color="#8B7DB8" size={24} />
               </View>
               
               {/* 右侧上下两个输出框 */}
