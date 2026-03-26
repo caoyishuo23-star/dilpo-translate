@@ -176,6 +176,22 @@ export const createStyles = (theme: Theme) => {
     resultsContainer: {
       gap: Spacing.md,
     },
+    // 左右布局
+    resultsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    // 左侧箭头列
+    arrowColumn: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    // 右侧输出框列
+    outputColumn: {
+      flex: 1,
+      gap: Spacing.md,
+    },
     // 弧形箭头容器
     arrowContainer: {
       alignItems: 'center',

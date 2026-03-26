@@ -8,28 +8,28 @@ interface CurvedArrowProps {
 }
 
 /**
- * 弧形箭头组件 - 用于表示翻译结果的转换流程
- * 从上方输出框弯曲指向下方输出框
+ * 垂直弧形箭头组件 - 用于连接上下两个翻译输出框
+ * 从上方弯曲指向下方，表示翻译结果的转换流程
  */
 export function CurvedArrow({ color = '#8B7DB8', size = 40 }: CurvedArrowProps) {
   return (
     <View style={styles.container}>
-      <Svg width={size} height={size * 1.2} viewBox="0 0 40 48">
+      <Svg width={size} height={size * 2.5} viewBox="0 0 40 100">
         <Defs>
           <LinearGradient id="arrowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <Stop offset="0%" stopColor={color} stopOpacity="0.6" />
+            <Stop offset="0%" stopColor={color} stopOpacity="0.5" />
             <Stop offset="100%" stopColor={color} stopOpacity="1" />
           </LinearGradient>
         </Defs>
-        {/* 弧形曲线 + 箭头 */}
+        {/* 垂直弧形曲线 + 箭头 */}
         <Path
-          d="M20 0 
-             C 20 8, 35 12, 35 24 
-             C 35 36, 20 40, 20 48
-             M 20 48
-             L 14 40
-             M 20 48
-             L 26 40"
+          d="M20 5
+             C 20 20, 5 30, 5 50
+             C 5 70, 20 80, 20 95
+             M 20 95
+             L 14 85
+             M 20 95
+             L 26 85"
           fill="none"
           stroke="url(#arrowGradient)"
           strokeWidth="2.5"
@@ -45,6 +45,5 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4,
   },
 });
