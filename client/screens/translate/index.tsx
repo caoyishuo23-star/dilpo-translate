@@ -24,6 +24,7 @@ import { createStyles } from './styles';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { TargetLanguageModal } from '@/components/LanguageSelector';
 import { LearningModule } from '@/components/LearningModule';
+import { CurvedArrow } from '@/components/CurvedArrow';
 import {
   LanguageCode,
   LanguageInfo,
@@ -370,7 +371,7 @@ export default function TranslateScreen() {
     }
   };
 
-  // 翻译
+  // 翻译 - 两步串联翻译：源语言 → 主语言 → 参考语言
   const handleTranslate = async () => {
     if (!inputText.trim()) {
       Alert.alert('提示', '请输入要翻译的文本');
@@ -379,33 +380,61 @@ export default function TranslateScreen() {
 
     setIsTranslating(true);
     setError(null);
+    setPrimaryText('');
+    setSecondaryText('');
 
     try {
-      const response = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/translate`, {
+      // 第一步：源语言 → 主语言
+      const primaryResponse = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: inputText.trim(),
           sourceLang: sourceLang === 'auto' ? undefined : sourceLang,
           autoDetect: sourceLang === 'auto',
-          targetLangs: [primaryLang, secondaryLang],
+          targetLangs: [primaryLang],
         }),
       });
 
-      const data = await response.json();
+      const primaryData = await primaryResponse.json();
 
-      if (data.success && data.data) {
-        setPrimaryText(data.data.translations?.[primaryLang] || '');
-        setSecondaryText(data.data.translations?.[secondaryLang] || '');
-        setDetectedLang(data.data.detectedLang || null);
+      if (primaryData.success && primaryData.data) {
+        const primaryResult = primaryData.data.translations?.[primaryLang] || '';
+        setPrimaryText(primaryResult);
+        setDetectedLang(primaryData.data.detectedLang || null);
+
+        // 第二步：主翻译结果 → 参考语言
+        if (primaryResult) {
+          try {
+            const secondaryResponse = await fetch(`${EXPO_PUBLIC_BACKEND_BASE_URL}/api/v1/translate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: primaryResult,
+                sourceLang: primaryLang,
+                autoDetect: false,
+                targetLangs: [secondaryLang],
+              }),
+            });
+
+            const secondaryData = await secondaryResponse.json();
+
+            if (secondaryData.success && secondaryData.data) {
+              setSecondaryText(secondaryData.data.translations?.[secondaryLang] || '');
+            }
+          } catch (e) {
+            console.error('Secondary translation error:', e);
+            // 参考翻译失败不影响主翻译
+          }
+        }
         
         // 添加到历史记录
         const newItem: HistoryItem = {
           id: Date.now().toString(),
           sourceText: inputText.trim(),
-          primaryText: data.data.translations?.[primaryLang] || '',
-          secondaryText: data.data.translations?.[secondaryLang] || '',
-          sourceLang: data.data.detectedLang || sourceLang,
+          primaryText: primaryResult,
+          secondaryText: secondaryText,
+          sourceLang: primaryData.data.detectedLang || sourceLang,
           primaryLang,
           secondaryLang,
           timestamp: Date.now(),
@@ -414,7 +443,7 @@ export default function TranslateScreen() {
         setHistory(newHistory);
         await saveHistory(newHistory);
       } else {
-        setError(data.error || '翻译失败，请重试');
+        setError(primaryData.error || '翻译失败，请重试');
       }
     } catch (e) {
       console.error('Translation error:', e);
@@ -657,6 +686,11 @@ export default function TranslateScreen() {
               >
                 {primaryText || ' '}
               </ThemedText>
+            </View>
+
+            {/* 弧形箭头 - 表示从主翻译到参考翻译的转换 */}
+            <View style={styles.arrowContainer}>
+              <CurvedArrow color="#8B7DB8" size={36} />
             </View>
 
             {/* 参考翻译 */}

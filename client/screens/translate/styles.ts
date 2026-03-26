@@ -176,6 +176,12 @@ export const createStyles = (theme: Theme) => {
     resultsContainer: {
       gap: Spacing.md,
     },
+    // 弧形箭头容器
+    arrowContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: Spacing.xs,
+    },
     // 主翻译结果（第二语言）
     primaryOutputSection: {
       backgroundColor: '#FFFFFF',
