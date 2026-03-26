@@ -14,7 +14,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
-import * as Constants from 'expo-constants';
+import Constants from 'expo-constants';
 import { createFormDataFile } from '@/utils';
 import { Screen } from '@/components/Screen';
 import { ThemedText } from '@/components/ThemedText';
@@ -33,7 +33,7 @@ import {
 // 从环境变量或 extra 配置获取后端地址
 const EXPO_PUBLIC_BACKEND_BASE_URL = 
   process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 
-  (Constants.expoConfig as any)?.extra?.EXPO_PUBLIC_BACKEND_BASE_URL || 
+  (Constants as any).expoConfig?.extra?.EXPO_PUBLIC_BACKEND_BASE_URL || 
   'https://diplo-translate-server-production.up.railway.app';
 const HISTORY_STORAGE_KEY = 'translation_history';
 const LANGUAGE_SETTINGS_KEY = 'language_settings';
@@ -229,16 +229,37 @@ export default function TranslateScreen() {
         body: formData,
       });
 
+      // 检查 HTTP 状态
+      if (!response.ok) {
+        if (response.status === 503) {
+          Alert.alert(
+            '语音输入暂不可用',
+            '语音识别服务正在配置中，请稍后再试。\n\n您可以直接输入文字进行翻译。',
+            [{ text: '好的' }]
+          );
+          return;
+        }
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.success && data.data?.text) {
         setInputText(data.data.text);
       } else {
-        Alert.alert('提示', '语音识别失败，请重试');
+        Alert.alert(
+          '语音识别提示',
+          '未能识别语音内容，请尝试：\n• 说话更清晰\n• 在安静环境中录制\n• 靠近麦克风',
+          [{ text: '知道了' }]
+        );
       }
     } catch (e) {
       console.error('ASR error:', e);
-      Alert.alert('错误', '语音识别服务暂时不可用');
+      Alert.alert(
+        '语音输入暂不可用',
+        '语音识别服务正在配置中。\n\n您可以：\n• 直接输入文字进行翻译\n• 稍后再试',
+        [{ text: '好的' }]
+      );
     }
   };
 
@@ -251,6 +272,12 @@ export default function TranslateScreen() {
     if (playingState) {
       Speech.stop();
       setPlayingState(false);
+      return;
+    }
+
+    // 检查文本是否为空
+    if (!text || text.trim() === '') {
+      Alert.alert('提示', '没有可播放的内容');
       return;
     }
 
@@ -273,22 +300,42 @@ export default function TranslateScreen() {
 
       const speechLang = langMap[lang] || 'en-US';
 
+      // 检查设备是否支持该语言
+      const availableVoices = await Speech.getAvailableVoicesAsync();
+      const supportedLangs = availableVoices
+        .filter(v => v.language && v.language.startsWith(speechLang.split('-')[0]))
+        .map(v => v.language);
+      
+      const finalLang = supportedLangs.length > 0 ? supportedLangs[0] : 'en-US';
+      
       setPlayingState(true);
 
       Speech.speak(text, {
-        language: speechLang,
+        language: finalLang,
         rate: 0.9,
-        onDone: () => setPlayingState(false),
-        onError: () => {
+        pitch: 1.0,
+        onDone: () => {
           setPlayingState(false);
-          Alert.alert('提示', '语音播放失败');
+        },
+        onError: (error) => {
+          console.error('Speech error:', error);
+          setPlayingState(false);
+          // 如果设备不支持 TTS，给出友好提示
+          Alert.alert(
+            '语音播放提示',
+            '您的设备可能未安装语音引擎，或当前语言暂不支持语音播放。\n\n提示：可在系统设置中安装 Google 文字转语音引擎。',
+            [{ text: '知道了' }]
+          );
         },
         onStopped: () => setPlayingState(false),
       });
     } catch (e) {
       console.error('TTS error:', e);
       setPlayingState(false);
-      Alert.alert('错误', '语音播放失败');
+      Alert.alert(
+        '语音播放失败',
+        '请确保您的设备已安装语音引擎。\n\n提示：可在系统设置中安装 Google 文字转语音引擎。'
+      );
     }
   };
 
