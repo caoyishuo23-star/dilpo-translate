@@ -265,6 +265,57 @@ export const createStyles = (theme: Theme) => {
       alignItems: 'center',
       marginBottom: Spacing.sm,
     },
+    // 语言小卡片（在输出框内）
+    outputLangCard: {
+      backgroundColor: '#8B7DB8',
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full,
+    },
+    outputLangCardSecondary: {
+      backgroundColor: '#059669',
+    },
+    outputLangCardText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    outputLangCardTextSecondary: {
+      color: '#FFFFFF',
+    },
+    // 语言小卡片行（两个输出框之间）
+    langCardsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: Spacing.sm,
+      gap: Spacing.xs,
+    },
+    langCardPrimary: {
+      backgroundColor: '#8B7DB8',
+      paddingVertical: Spacing.xs + 2,
+      paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full,
+    },
+    langCardSecondary: {
+      backgroundColor: '#059669',
+      paddingVertical: Spacing.xs + 2,
+      paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full,
+    },
+    langCardText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: '#FFFFFF',
+    },
+    langCardArrow: {
+      width: 28,
+      height: 28,
+      borderRadius: BorderRadius.full,
+      backgroundColor: '#F5F0FA',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     outputLangLabel: {
       fontSize: 13,
       fontWeight: '600',
