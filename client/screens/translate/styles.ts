@@ -93,7 +93,7 @@ export const createStyles = (theme: Theme) => {
       gap: Spacing.xs,
       paddingVertical: Spacing.xs + 2,
       paddingHorizontal: Spacing.md,
-      backgroundColor: '#059669',
+      backgroundColor: '#3B82F6',
       borderRadius: BorderRadius.full,
     },
     langButtonText: {
@@ -260,7 +260,7 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.full,
     },
     flowLangTagSecondary: {
-      backgroundColor: '#059669',
+      backgroundColor: '#3B82F6',
     },
     flowLangText: {
       color: '#FFFFFF',
@@ -313,7 +313,7 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.full,
     },
     outputLangCardSecondary: {
-      backgroundColor: '#059669',
+      backgroundColor: '#3B82F6',
     },
     outputLangCardText: {
       fontSize: 12,
@@ -338,7 +338,7 @@ export const createStyles = (theme: Theme) => {
       borderRadius: BorderRadius.full,
     },
     langCardSecondary: {
-      backgroundColor: '#059669',
+      backgroundColor: '#3B82F6',
       paddingVertical: Spacing.xs + 2,
       paddingHorizontal: Spacing.md,
       borderRadius: BorderRadius.full,
