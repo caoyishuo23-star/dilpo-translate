@@ -66,6 +66,46 @@ export const createStyles = (theme: Theme) => {
       shadowRadius: 4,
       elevation: 3,
     },
+    // 小箭头
+    arrowButtonSmall: {
+      width: 24,
+      height: 24,
+      borderRadius: BorderRadius.full,
+      backgroundColor: '#F5F0FA',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    // 语言按钮
+    langButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.xs,
+      paddingVertical: Spacing.xs + 2,
+      paddingHorizontal: Spacing.md,
+      backgroundColor: '#8B7DB8',
+      borderRadius: BorderRadius.full,
+    },
+    langButtonSecondary: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: Spacing.xs,
+      paddingVertical: Spacing.xs + 2,
+      paddingHorizontal: Spacing.md,
+      backgroundColor: '#059669',
+      borderRadius: BorderRadius.full,
+    },
+    langButtonText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    langButtonTextSecondary: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+    },
     targetLangButton: {
       flex: 1,
       flexDirection: 'row',

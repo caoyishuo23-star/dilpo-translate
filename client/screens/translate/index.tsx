@@ -536,7 +536,7 @@ export default function TranslateScreen() {
           </ThemedText>
         </ThemedView>
 
-        {/* Language Selector - 简洁形式：源语言 → 目标语言组合 */}
+        {/* Language Selector - 串联翻译流程：源语言 → 主翻译 → 参考翻译 */}
         <View style={styles.languageSelector}>
           {/* 源语言选择 */}
           <LanguageSelector
@@ -547,20 +547,33 @@ export default function TranslateScreen() {
           />
 
           {/* 箭头 */}
-          <View style={styles.arrowButton}>
-            <FontAwesome6 name="arrow-right-arrow-left" size={16} color="#FFFFFF" />
+          <View style={styles.arrowButtonSmall}>
+            <FontAwesome6 name="arrow-right" size={12} color="#8B7DB8" />
           </View>
 
-          {/* 目标语言组合 */}
+          {/* 主翻译语言 */}
           <TouchableOpacity
-            style={styles.targetLangButton}
-            onPress={() => {
-              // 显示Modal让用户选择两种目标语言
-              setShowTargetLangModal(true);
-            }}
+            style={styles.langButton}
+            onPress={() => setShowTargetLangModal(true)}
           >
-            <ThemedText style={styles.targetLangText}>
-              {getLanguageByCode(primaryLang).nativeName} + {getLanguageByCode(secondaryLang).nativeName}
+            <ThemedText style={styles.langButtonText}>
+              {getLanguageByCode(primaryLang).nativeName}
+            </ThemedText>
+            <FontAwesome6 name="chevron-down" size={10} color="#666666" />
+          </TouchableOpacity>
+
+          {/* 箭头 */}
+          <View style={styles.arrowButtonSmall}>
+            <FontAwesome6 name="arrow-right" size={12} color="#059669" />
+          </View>
+
+          {/* 参考翻译语言 */}
+          <TouchableOpacity
+            style={styles.langButtonSecondary}
+            onPress={() => setShowTargetLangModal(true)}
+          >
+            <ThemedText style={styles.langButtonTextSecondary}>
+              {getLanguageByCode(secondaryLang).nativeName}
             </ThemedText>
             <FontAwesome6 name="chevron-down" size={10} color="#666666" />
           </TouchableOpacity>
