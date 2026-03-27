@@ -701,19 +701,6 @@ export default function TranslateScreen() {
               </ThemedText>
             </View>
 
-            {/* 语言小卡片 + 箭头连接 */}
-            <View style={styles.langCardsRow}>
-              <View style={styles.langCardPrimary}>
-                <ThemedText style={styles.langCardText}>{primaryLangInfo.nativeName}</ThemedText>
-              </View>
-              <View style={styles.langCardArrow}>
-                <FontAwesome6 name="arrow-down" size={12} color="#8B7DB8" />
-              </View>
-              <View style={styles.langCardSecondary}>
-                <ThemedText style={styles.langCardText}>{secondaryLangInfo.nativeName}</ThemedText>
-              </View>
-            </View>
-
             {/* 参考翻译 */}
             <View style={styles.secondaryOutputSection}>
               <View style={styles.outputHeader}>
