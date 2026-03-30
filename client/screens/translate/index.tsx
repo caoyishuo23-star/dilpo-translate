@@ -564,7 +564,7 @@ export default function TranslateScreen() {
 
           {/* 箭头 */}
           <View style={styles.arrowButtonSmall}>
-            <FontAwesome6 name="arrow-right" size={12} color="#3B82F6" />
+            <FontAwesome6 name="arrow-right" size={12} color="#A78BFA" />
           </View>
 
           {/* 参考翻译语言 */}
@@ -725,14 +725,14 @@ export default function TranslateScreen() {
                         <FontAwesome6 
                           name={isPlayingSecondary ? "stop" : "volume-high"} 
                           size={14} 
-                          color="#3B82F6" 
+                          color="#A78BFA" 
                         />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.outputActionButton}
                         onPress={() => handleCopy(secondaryText)}
                       >
-                        <FontAwesome6 name="copy" size={14} color="#3B82F6" />
+                        <FontAwesome6 name="copy" size={14} color="#A78BFA" />
                       </TouchableOpacity>
                     </View>
                   </View>
