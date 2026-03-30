@@ -602,7 +602,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: Spacing.xs }}>
           <FontAwesome6 name="battery-full" size={16} color="#8B7DB8" />
           <ThemedText style={{ fontSize: 15, fontWeight: '600', color: '#1A1A2E' }}>
-            充电小站
+            {langInfo.nativeName}学习
           </ThemedText>
         </View>
       </View>
