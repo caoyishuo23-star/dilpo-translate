@@ -78,7 +78,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "eas": {
         "projectId": "4410de29-fee8-470f-a545-54866344b4f4"
       },
-      "EXPO_PUBLIC_BACKEND_BASE_URL": "https://diplo-translate-server-production.up.railway.app"
+      "EXPO_PUBLIC_BACKEND_BASE_URL": process.env.EXPO_PUBLIC_BACKEND_BASE_URL || "http://localhost:9091"
     }
   }
 }
