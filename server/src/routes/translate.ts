@@ -4,7 +4,7 @@ const router = express.Router();
 
 // 千问 API 配置
 const QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
-const QWEN_MODEL = "qwen-plus"; // 可选: qwen-turbo, qwen-plus, qwen-max
+const QWEN_MODEL = "qwen3.5-plus"; // 阿里云百炼 OpenAI 兼容接口
 
 // 默认 API Key（建议通过环境变量配置）
 const DEFAULT_QWEN_API_KEY = "";
