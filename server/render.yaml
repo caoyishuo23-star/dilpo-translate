@@ -1,14 +1,19 @@
+# Render 部署配置
+# 访问 https://render.com/docs/yaml 查看完整配置选项
+
 services:
   - type: web
-    name: diplo-translate-api
-    env: node
+    name: dilpo-translate-api
     region: singapore
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    rootDir: server
+    buildCommand: pnpm install && pnpm run build
+    startCommand: pnpm run start
     healthCheckPath: /api/v1/health
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: qwen
+        sync: false  # 需要在 Render 控制台设置
