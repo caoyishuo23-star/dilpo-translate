@@ -35,7 +35,7 @@ import {
 const EXPO_PUBLIC_BACKEND_BASE_URL = 
   process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 
   (Constants as any).expoConfig?.extra?.EXPO_PUBLIC_BACKEND_BASE_URL || 
-  'https://diplo-translate-server-production.up.railway.app';
+  'https://nancy.zeabur.app';
 const HISTORY_STORAGE_KEY = 'translation_history';
 const LANGUAGE_SETTINGS_KEY = 'language_settings';
 

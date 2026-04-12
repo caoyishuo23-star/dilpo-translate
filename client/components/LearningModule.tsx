@@ -58,7 +58,7 @@ export function LearningModule({ primaryLang, recentWords = [] }: LearningModule
   
   const soundRef = useRef<Audio.Sound | null>(null);
 
-  const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL;
+  const EXPO_PUBLIC_BACKEND_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_BASE_URL || 'https://nancy.zeabur.app';
   const langInfo = getLanguageByCode(primaryLang);
   const phrases = getPhrasesForLanguage(primaryLang);
   const isEnglish = primaryLang === 'en';
