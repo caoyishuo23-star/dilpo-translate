@@ -6,8 +6,8 @@ WORKDIR /app
 # 复制 package 文件
 COPY package*.json ./
 
-# 安装依赖
-RUN npm install --ignore-scripts
+# 安装所有依赖（包括 devDependencies）
+RUN npm install
 
 # 复制源代码
 COPY . .
