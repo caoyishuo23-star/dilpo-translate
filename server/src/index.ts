@@ -8,7 +8,7 @@ import audioRouter from "./routes/audio";
 import learningRouter from "./routes/learning";
 
 const app = express();
-const port = process.env.PORT || 9091;
+const port = process.env.PORT || 8081;
 
 // Middleware
 app.use(cors());
