@@ -38,7 +38,7 @@ async function callQwenAPI(messages: any[], temperature: number = 0.5): Promise<
       model: QWEN_MODEL,
       messages: messages,
       temperature: temperature,
-      thinking: { type: "off" }, // 禁用思考模式，加速
+      thinking: { type: "disabled" }, // 禁用思考模式，加速
     },
     {
       headers: {
@@ -70,26 +70,10 @@ router.post("/related", async (req: Request, res: Response) => {
 
     const targetLangName = languageNames[targetLang] || targetLang;
 
-    const systemPrompt = `你是一位专业的语言学习助手。请根据用户提供的单词或短语，生成${count}个实用的${targetLangName}学习句子。
+    const systemPrompt = `Generate ${count} example sentences for learning ${targetLangName}.
+Return JSON: {"sentences":[{"source":"zh","target":"trans","word":"w"}]}`;
 
-要求：
-1. 每个句子必须包含用户提供的至少一个单词
-2. 句子要实用、贴近日常生活场景
-3. 句子难度适中，适合语言学习者
-4. 每个句子都要有中文原文和${targetLangName}翻译
-5. 返回JSON格式，格式如下：
-{
-  "sentences": [
-    {
-      "source": "中文句子",
-      "target": "${targetLangName}翻译",
-      "word": "句子中用到的用户单词"
-    }
-  ]
-}`;
-
-    const userPrompt = `请根据以下单词/短语生成${count}个实用学习句子：
-${words.join(", ")}`;
+    const userPrompt = `Words: ${words.join(", ")}`;
 
     const messages = [
       { role: "system", content: systemPrompt },
@@ -144,28 +128,10 @@ router.post("/ielts", async (req: Request, res: Response) => {
       });
     }
 
-    const systemPrompt = `你是一位资深的雅思考试培训专家。请根据用户提供的单词或短语，生成${count}个真实的雅思考试风格的句子。
+    const systemPrompt = `Generate ${count} IELTS-style example sentences using ${targetLangName}.
+Return JSON: {"sentences":[{"s":"eng","t":"type","v":["word1"],"tr":"zh"}]}`;
 
-要求：
-1. 句子必须是雅思阅读、听力或写作中可能出现的真实风格
-2. 难度要符合雅思6.5-7.5分的水平
-3. 每个句子要标注类型：Reading（阅读风格）、Listening（听力风格）、Writing Task 1/2（写作风格）
-4. 句子内容要学术化、正式化
-5. 每个句子要包含用户提供的至少一个单词
-6. 返回JSON格式，格式如下：
-{
-  "sentences": [
-    {
-      "sentence": "英文句子",
-      "type": "Reading",
-      "vocabulary": ["句子中包含的重点词汇"],
-      "translation": "中文翻译"
-    }
-  ]
-}`;
-
-    const userPrompt = `请根据以下单词/短语生成${count}个雅思风格的句子：
-${words.join(", ")}`;
+    const userPrompt = `Words: ${words.join(", ")}`;
 
     const messages = [
       { role: "system", content: systemPrompt },
