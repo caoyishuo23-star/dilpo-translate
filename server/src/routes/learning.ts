@@ -1,7 +1,14 @@
 import express, { type Request, type Response } from "express";
-import { LLMClient, Config, HeaderUtils } from "coze-coding-dev-sdk";
+import axios from "axios";
 
 const router = express.Router();
+
+// 千问 API 配置
+const QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+const QWEN_MODEL = "qwen3.5-plus"; // 阿里云百炼 OpenAI 兼容接口
+
+// 默认 API Key（建议通过环境变量配置）
+const DEFAULT_QWEN_API_KEY = "";
 
 // 语言代码映射
 const languageNames: Record<string, string> = {
@@ -15,6 +22,36 @@ const languageNames: Record<string, string> = {
   es: "西班牙语",
   ar: "阿拉伯语",
 };
+
+// 调用千问 API
+async function callQwenAPI(messages: any[], temperature: number = 0.7): Promise<string> {
+  const apiKey = process.env.qwen || process.env.QWEN_API_KEY || process.env.DASHSCOPE_API_KEY || DEFAULT_QWEN_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("Missing QWEN_API_KEY environment variable");
+  }
+
+  const response = await axios.post(
+    QWEN_API_URL,
+    {
+      model: QWEN_MODEL,
+      messages: messages,
+      temperature: temperature,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      timeout: 60000,
+    }
+  );
+
+  if (response.data.choices && response.data.choices.length > 0) {
+    return response.data.choices[0].message.content;
+  }
+  throw new Error("No response content from Qwen API");
+}
 
 // 生成与搜索词相关的句子
 router.post("/related", async (req: Request, res: Response) => {
@@ -30,13 +67,6 @@ router.post("/related", async (req: Request, res: Response) => {
     }
 
     const targetLangName = languageNames[targetLang] || targetLang;
-
-    // 创建LLM客户端
-    const customHeaders = HeaderUtils.extractForwardHeaders(
-      req.headers as Record<string, string>
-    );
-    const config = new Config();
-    const client = new LLMClient(config, customHeaders);
 
     const systemPrompt = `你是一位专业的语言学习助手。请根据用户提供的单词或短语，生成${count}个实用的${targetLangName}学习句子。
 
@@ -60,19 +90,15 @@ router.post("/related", async (req: Request, res: Response) => {
 ${words.join(", ")}`;
 
     const messages = [
-      { role: "system" as const, content: systemPrompt },
-      { role: "user" as const, content: userPrompt },
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
     ];
 
-    const response = await client.invoke(messages, {
-      model: "doubao-seed-1-6-251015",
-      temperature: 0.7,
-    });
+    const content = await callQwenAPI(messages, 0.7);
 
     // 尝试解析JSON
     let sentences;
     try {
-      const content = response.content;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
@@ -116,13 +142,6 @@ router.post("/ielts", async (req: Request, res: Response) => {
       });
     }
 
-    // 创建LLM客户端
-    const customHeaders = HeaderUtils.extractForwardHeaders(
-      req.headers as Record<string, string>
-    );
-    const config = new Config();
-    const client = new LLMClient(config, customHeaders);
-
     const systemPrompt = `你是一位资深的雅思考试培训专家。请根据用户提供的单词或短语，生成${count}个真实的雅思考试风格的句子。
 
 要求：
@@ -147,20 +166,15 @@ router.post("/ielts", async (req: Request, res: Response) => {
 ${words.join(", ")}`;
 
     const messages = [
-      { role: "system" as const, content: systemPrompt },
-      { role: "user" as const, content: userPrompt },
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
     ];
 
-    const response = await client.invoke(messages, {
-      model: "doubao-seed-1-6-251015",
-      temperature: 0.7,
-    });
+    const content = await callQwenAPI(messages, 0.7);
 
     // 尝试解析JSON
     let sentences;
     try {
-      // 提取JSON部分
-      const content = response.content;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
@@ -169,10 +183,9 @@ ${words.join(", ")}`;
         throw new Error("No JSON found");
       }
     } catch {
-      // 如果解析失败，返回简单的句子
       sentences = [
         {
-          sentence: response.content.substring(0, 200),
+          sentence: content.substring(0, 200),
           type: "Reading",
           vocabulary: words.slice(0, 3),
           translation: "系统生成的雅思风格句子",
