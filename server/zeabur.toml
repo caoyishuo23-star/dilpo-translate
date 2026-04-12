@@ -4,14 +4,13 @@
 [service]
 name = "dilpo-translate-api"
 region = "singapore"
-plan = "free"
 
-[service.build]
-command = "pnpm install && pnpm run build"
+[build]
+command = "npm install --ignore-scripts && npm run build"
 
-[service.start]
+[start]
 command = "npm start"
 
-[service.env]
+[env]
 NODE_ENV = "production"
 PORT = "10000"
