@@ -1,0 +1,19 @@
+# Zeabur 部署配置
+# https://zeabur.com/docs/deploy/configuration
+
+[service]
+name = "dilpo-translate-api"
+region = "auto"  # 自动选择最优区域
+plan = "free"
+
+[service.build]
+command = "pnpm install && pnpm run build"
+
+[service.start]
+command = "pnpm run start"
+
+[service.env]
+NODE_ENV = "production"
+PORT = "10000"
+
+# qwen API Key 需要在 Zeabur 控制台设置
