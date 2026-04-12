@@ -112,33 +112,13 @@ router.post("/", async (req: Request, res: Response) => {
 
     // 判断是否需要自动检测
     const needDetect = autoDetect || sourceLang === "auto" || !sourceLang;
-    const knownSourceLang = needDetect ? "检测出的源语言" : (languageNames[sourceLang] || sourceLang);
 
-    // 构建系统提示
-    let systemPrompt: string;
+    // 构建极简 prompt（加速）
     let userPrompt: string;
-
     if (needDetect) {
-      systemPrompt = `你是专业翻译。根据用户文本，完成以下任务并返回JSON格式：
-1. 检测源语言（返回语言代码，如zh/en/ja等）
-2. 翻译到指定目标语言
-
-返回格式（不要有任何其他内容）：
-{"detected":"语言代码","translations":{"语言代码":"翻译结果"}}`;
-      
-      userPrompt = `文本：${text}
-目标语言：${targetLangList}
-请检测源语言并翻译。`;
+      userPrompt = `Detect lang and translate "${text.replace(/"/g, '\\"')}" to ${langs.join(",")} in {"d":"","${langs.join('":"","')}":""}`;
     } else {
-      systemPrompt = `你是专业翻译。将文本翻译到指定目标语言，返回JSON格式。
-只返回翻译结果，不要有任何其他内容。
-
-返回格式：
-{"translations":{"语言代码":"翻译结果"}}`;
-
-      userPrompt = `将以下${knownSourceLang}翻译成${targetLangNames}：
-${text}
-目标语言代码：${targetLangList}`;
+      userPrompt = `Translate "${text.replace(/"/g, '\\"')}" to ${langs.join(",")} in {"${langs.join('":"","')}":""}`;
     }
 
     // 调用千问 API（禁用思考模式，加速）
@@ -151,7 +131,6 @@ ${text}
       body: JSON.stringify({
         model: QWEN_MODEL,
         messages: [
-          { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         temperature: 0.1,
@@ -181,13 +160,21 @@ ${text}
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         
-        if (parsed.detected) {
-          const detected = String(parsed.detected).toLowerCase().substring(0, 2);
+        // 检测语言（可能在 "d" 或 "detected" 字段）
+        const detectedField = parsed.d || parsed.detected;
+        if (detectedField) {
+          const detected = String(detectedField).toLowerCase().substring(0, 2);
           detectedLang = detected in languageNames ? detected : "zh";
         }
         
-        if (parsed.translations) {
-          Object.assign(result, parsed.translations);
+        // 翻译结果（可能在根层级或 translations 下）
+        const translations = parsed.translations || parsed;
+        if (translations) {
+          langs.forEach((lang: string) => {
+            if (translations[lang]) {
+              result[lang] = translations[lang];
+            }
+          });
         }
       }
     } catch (parseError) {
