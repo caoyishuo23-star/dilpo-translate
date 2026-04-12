@@ -1,8 +1,9 @@
 // 简单的构建脚本
 import { build } from 'esbuild';
+import { readFileSync } from 'fs';
 
-const pkg = await import('./package.json', { assert: { type: 'json' } });
-const dependencies = pkg.default.dependencies || {};
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
+const dependencies = pkg.dependencies || {};
 const externalList = Object.keys(dependencies).filter(dep => dep !== 'dayjs');
 
 try {
