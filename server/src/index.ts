@@ -9,6 +9,7 @@ import learningRouter from "./routes/learning";
 
 const app = express();
 const port = process.env.PORT || 8081;
+console.log(`PORT env: ${process.env.PORT}`);
 
 // Middleware
 app.use(cors());
