@@ -1,12 +1,12 @@
-import * as esbuild from 'esbuild';
-import { createRequire } from 'module';
+// 简单的构建脚本
+import { build } from 'esbuild';
 
-const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
-const dependencies = pkg.dependencies || {};
+const pkg = await import('./package.json', { assert: { type: 'json' } });
+const dependencies = pkg.default.dependencies || {};
 const externalList = Object.keys(dependencies).filter(dep => dep !== 'dayjs');
+
 try {
-  await esbuild.build({
+  await build({
     entryPoints: ['src/index.ts'],
     bundle: true,
     platform: 'node',
