@@ -4,9 +4,11 @@ const router = express.Router();
 
 // 千问 API 配置
 const QWEN_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
-const QWEN_MODEL = "qwen3.5-plus"; // 阿里云百炼 OpenAI 兼容接口
 
-// 默认 API Key（建议通过环境变量配置）
+// 使用 qwen3.5-flash 作为翻译模型（最快）
+const QWEN_MODEL = "qwen3.5-flash";
+
+// 默认 API Key
 const DEFAULT_QWEN_API_KEY = "";
 
 // 语言代码映射 - 扩展支持所有语言
@@ -139,7 +141,7 @@ ${text}
 目标语言代码：${targetLangList}`;
     }
 
-    // 调用千问 API
+    // 调用千问 API（使用更快的小模型）
     const response = await fetch(QWEN_API_URL, {
       method: "POST",
       headers: {
@@ -152,7 +154,7 @@ ${text}
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.3,
+        temperature: 0.1, // 低温度，更快更稳定
       }),
     });
 
