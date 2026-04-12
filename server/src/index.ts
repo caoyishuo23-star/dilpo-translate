@@ -8,8 +8,8 @@ import audioRouter from "./routes/audio";
 import learningRouter from "./routes/learning";
 
 const app = express();
-const port = process.env.PORT || 8081;
-console.log(`PORT env: ${process.env.PORT}`);
+// Zeabur 期望服务监听 8080 端口
+const port = 8080;
 
 // Middleware
 app.use(cors());
