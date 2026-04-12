@@ -141,7 +141,7 @@ ${text}
 目标语言代码：${targetLangList}`;
     }
 
-    // 调用千问 API（使用更快的小模型）
+    // 调用千问 API（禁用思考模式，加速）
     const response = await fetch(QWEN_API_URL, {
       method: "POST",
       headers: {
@@ -154,7 +154,8 @@ ${text}
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        temperature: 0.1, // 低温度，更快更稳定
+        temperature: 0.1,
+        thinking: { type: "disabled" }, // 禁用思考模式，加速
       }),
     });
 

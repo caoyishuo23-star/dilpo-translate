@@ -38,13 +38,14 @@ async function callQwenAPI(messages: any[], temperature: number = 0.5): Promise<
       model: QWEN_MODEL,
       messages: messages,
       temperature: temperature,
+      thinking: { type: "off" }, // 禁用思考模式，加速
     },
     {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      timeout: 30000, // 30秒超时
+      timeout: 30000,
     }
   );
 
